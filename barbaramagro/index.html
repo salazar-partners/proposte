@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Proposta Automatizzazioni n8n — Barbara Magro Luxury Real Estate</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; background: #f8fafc; color: #0f172a; }
+
+  .hero { background: linear-gradient(135deg, #0f172a, #1e293b); padding: 52px 48px; }
+  .hero-tag { display: inline-block; background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.2); color: #cbd5e1; font-size: 11px; font-weight: 700; padding: 4px 14px; border-radius: 20px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 18px; }
+  .hero h1 { font-size: 36px; font-weight: 800; color: #fff; line-height: 1.15; max-width: 600px; }
+  .hero h1 span { color: #fbbf24; }
+  .hero p { color: #94a3b8; font-size: 16px; margin-top: 12px; max-width: 520px; line-height: 1.6; }
+  .hero-chips { display: flex; gap: 12px; margin-top: 28px; flex-wrap: wrap; }
+  .hchip { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.18); color: #e2e8f0; padding: 8px 16px; border-radius: 8px; font-size: 13px; }
+  .hchip strong { color: #fbbf24; }
+
+  .wrap { max-width: 860px; margin: 0 auto; padding: 0 40px; }
+  .sec-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: #b45309; margin-bottom: 8px; }
+  .sec-title { font-size: 24px; font-weight: 800; color: #0f172a; margin-bottom: 24px; }
+  .sec-title span { color: #92400e; }
+
+  .problems { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; margin-bottom: 52px; }
+  .prob { background: #fff; border: 1px solid #e2e8f0; border-radius: 14px; padding: 22px; }
+  .prob .ico { font-size: 28px; margin-bottom: 10px; }
+  .prob h3 { font-size: 14px; font-weight: 700; margin-bottom: 6px; }
+  .prob p { font-size: 13px; color: #64748b; line-height: 1.5; }
+  .prob .cost { font-size: 12px; color: #ef4444; font-weight: 600; margin-top: 10px; }
+
+  .workflow-section { margin-bottom: 40px; }
+  .wf-label { display: flex; align-items: center; gap: 14px; margin-bottom: 16px; }
+  .wf-badge { width: 32px; height: 32px; border-radius: 50%; color: #fff; font-weight: 800; font-size: 14px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .wf-title { font-size: 16px; font-weight: 700; color: #0f172a; }
+  .wf-price { font-size: 13px; color: #64748b; }
+
+  .canvas-wrap { background: #1a1a2e; border-radius: 16px; overflow: hidden; border: 1px solid #2d2d4e; }
+  .canvas-topbar { background: #13132a; padding: 10px 18px; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid #2d2d4e; }
+  .dot-r { width: 10px; height: 10px; border-radius: 50%; background: #ff5f57; }
+  .dot-y { width: 10px; height: 10px; border-radius: 50%; background: #febc2e; }
+  .dot-g { width: 10px; height: 10px; border-radius: 50%; background: #28c840; }
+  .canvas-name { font-size: 12px; color: #6b7280; margin-left: 8px; }
+
+  .canvas { position: relative; width: 100%; overflow-x: auto; }
+  .canvas-inner { position: relative; min-width: 820px; height: 220px; }
+  .canvas-inner { background-image: radial-gradient(circle, #2d2d4e 1px, transparent 1px); background-size: 24px 24px; }
+
+  .n8n-node { position: absolute; width: 160px; background: #1e1e3f; border: 1px solid #3d3d6b; border-radius: 10px; overflow: hidden; cursor: default; box-shadow: 0 4px 20px rgba(0,0,0,0.4); }
+  .n8n-node:hover { border-color: #6366f1; box-shadow: 0 4px 20px rgba(99,102,241,0.3); }
+  .node-top { height: 5px; }
+  .node-body { padding: 10px 12px; display: flex; align-items: center; gap: 10px; }
+  .node-icon-wrap { width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+  .node-text { flex: 1; min-width: 0; }
+  .node-name { font-size: 11px; font-weight: 700; color: #e2e8f0; line-height: 1.3; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .node-sub { font-size: 10px; color: #6b7280; margin-top: 2px; }
+
+  .port-in { position: absolute; left: -5px; top: 50%; transform: translateY(-50%); width: 10px; height: 10px; border-radius: 50%; background: #3d3d6b; border: 2px solid #6366f1; }
+  .port-out { position: absolute; right: -5px; top: 50%; transform: translateY(-50%); width: 10px; height: 10px; border-radius: 50%; background: #3d3d6b; border: 2px solid #6366f1; }
+
+  .connections { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; }
+
+  .results-strip { background: #13132a; padding: 12px 20px; display: flex; gap: 16px; flex-wrap: wrap; }
+  .res-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: #94a3b8; }
+  .res-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+
+  .email-preview-wrap { background: #f1f5f9; border-radius: 16px; padding: 24px; margin-bottom: 40px; }
+  .ep-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #64748b; margin-bottom: 14px; }
+  .email-card { background: #fff; border-radius: 12px; padding: 28px; border: 1px solid #e2e8f0; font-family: Arial, sans-serif; }
+  .email-card h2 { color: #0f172a; font-size: 18px; }
+  .email-card .edate { color: #94a3b8; font-size: 12px; margin-top: 4px; }
+  .estats { display: flex; gap: 10px; margin: 18px 0; flex-wrap: wrap; }
+  .estat { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 12px 16px; text-align: center; flex: 1; min-width: 80px; }
+  .estat .en { font-size: 22px; font-weight: 800; color: #92400e; }
+  .estat .el { font-size: 11px; color: #94a3b8; }
+  .etable { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .etable th { background: #0f172a; color: #fff; padding: 8px 12px; text-align: left; font-size: 12px; }
+  .etable td { padding: 8px 12px; border-bottom: 1px solid #f1f5f9; }
+  .ebadge { display: inline-block; padding: 2px 8px; border-radius: 9999px; font-size: 11px; font-weight: 600; }
+  .ebg { background: #dcfce7; color: #166534; }
+  .ebb { background: #fef3c7; color: #92400e; }
+  .ebc { background: #dbeafe; color: #1e40af; }
+
+  .roi-bar { background: #0f172a; border-radius: 16px; padding: 32px; margin-bottom: 40px; }
+  .roi-bar h3 { color: #fff; font-size: 18px; font-weight: 700; margin-bottom: 20px; }
+  .roi-items { display: grid; grid-template-columns: repeat(4,1fr); gap: 14px; }
+  .roi-i { background: rgba(255,255,255,0.08); border-radius: 12px; padding: 18px; text-align: center; }
+  .roi-i .rn { font-size: 26px; font-weight: 900; color: #fbbf24; }
+  .roi-i .rl { font-size: 11px; color: #94a3b8; margin-top: 4px; line-height: 1.4; }
+
+  .cal-box { background: #fff; border: 2px solid #0f172a; border-radius: 20px; padding: 36px; margin-bottom: 52px; }
+  .cal-box h2 { font-size: 22px; font-weight: 800; text-align: center; }
+  .cal-box .sub { color: #64748b; font-size: 14px; text-align: center; margin-top: 6px; margin-bottom: 28px; }
+  .slots-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 24px; max-width: 600px; margin-left: auto; margin-right: auto; }
+  .slot-card { border: 2px solid #e2e8f0; border-radius: 14px; padding: 14px 10px; text-align: center; cursor: pointer; transition: all 0.18s; }
+  .slot-card:hover { border-color: #0f172a; background: #f8fafc; transform: translateY(-2px); }
+  .slot-card.selected { border-color: #0f172a; background: #0f172a; color: #fff; transform: translateY(-2px); box-shadow: 0 4px 16px rgba(15,23,42,0.3); }
+  .slot-card .day-name { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.7px; color: #64748b; }
+  .slot-card.selected .day-name { color: #94a3b8; }
+  .slot-card .day-num { font-size: 28px; font-weight: 900; color: #0f172a; margin: 4px 0; }
+  .slot-card.selected .day-num { color: #fff; }
+  .slot-card .month { font-size: 11px; color: #94a3b8; }
+  .slot-card.selected .month { color: #64748b; }
+  .slot-card .time { font-size: 13px; font-weight: 700; color: #92400e; margin-top: 8px; background: #fef3c7; border-radius: 6px; padding: 4px 6px; }
+  .slot-card.selected .time { color: #fbbf24; background: rgba(251,191,36,0.15); }
+  .slot-card .dur { font-size: 10px; color: #94a3b8; margin-top: 3px; }
+  .slot-card.selected .dur { color: #64748b; }
+
+  .confirm-area { display: none; background: #f8fafc; border-radius: 14px; padding: 24px; margin-top: 4px; }
+  .confirm-area.show { display: block; }
+  .confirm-area h3 { font-size: 15px; font-weight: 700; margin-bottom: 16px; }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+  .form-input { width: 100%; padding: 10px 14px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 14px; outline: none; font-family: inherit; }
+  .form-input:focus { border-color: #0f172a; box-shadow: 0 0 0 3px rgba(15,23,42,0.1); }
+  .confirm-btn { width: 100%; background: #0f172a; color: #fff; border: none; padding: 13px; border-radius: 10px; font-weight: 700; font-size: 15px; cursor: pointer; margin-top: 4px; }
+  .confirm-btn:hover { background: #1e293b; }
+  .cta-note { font-size: 12px; color: #94a3b8; text-align: center; margin-top: 14px; }
+
+  .spacer { height: 48px; }
+  @media(max-width:640px){ .problems,.roi-items{ grid-template-columns:1fr; } .wrap{ padding:0 20px; } }
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="wrap">
+    <div style="font-size:11px;font-weight:700;letter-spacing:4px;text-transform:uppercase;color:#fbbf24;margin-bottom:8px;">SALAZAR PARTNERS</div>
+    <div class="hero-tag">Proposta personalizzata · Barbara Magro Luxury Real Estate · Milano</div>
+    <h1>Automatizzate la gestione<br>dei clienti luxury <span>con n8n</span></h1>
+    <p>2 workflow attivi in 4 settimane che eliminano i follow-up manuali, accelerano il contatto con i lead high-value e mantengono i clienti HNWI sempre aggiornati sulle proprietà.</p>
+    <div class="hero-chips">
+      <div class="hchip">💰 <strong>€40.000</strong> · 2 fasi da €20.000</div>
+      <div class="hchip">📅 <strong>2 fasi</strong> · 4 settimane totali</div>
+      <div class="hchip">⚡ Fase 1 attiva in <strong>8–10 giorni</strong></div>
+      <div class="hchip">🔒 Stop senza penali dopo ogni fase</div>
+    </div>
+  </div>
+</div>
+
+<div class="spacer"></div>
+
+<!-- PROBLEMS -->
+<div class="wrap">
+  <div class="sec-label">Il problema oggi</div>
+  <div class="sec-title">Ore perse ogni giorno in processi <span>che si automatizzano</span></div>
+  <div class="problems">
+    <div class="prob">
+      <div class="ico">📥</div>
+      <h3>Lead luxury gestiti a mano</h3>
+      <p>Ogni contatto da referral, Sotheby's, o dal sito viene valutato e seguito manualmente. In un mercato luxury la velocità di risposta è tutto.</p>
+      <div class="cost">Lead high-value persi ogni settimana</div>
+    </div>
+    <div class="prob">
+      <div class="ico">⏱️</div>
+      <h3>Follow-up dimenticati</h3>
+      <p>I clienti HNWI si aspettano attenzione proattiva. Un immobile nuovo che corrisponde al loro profilo dovrebbe arrivargli prima che lo trovino da soli.</p>
+      <div class="cost">Clienti persi per mancanza di proattività</div>
+    </div>
+    <div class="prob">
+      <div class="ico">📊</div>
+      <h3>Nessuna visione del pipeline</h3>
+      <p>Senza un sistema automatizzato, è difficile sapere in tempo reale quanti clienti attivi ci sono, a che punto sono le trattative e quali lead sono "caldi".</p>
+      <div class="cost">Decisioni prese senza dati aggiornati</div>
+    </div>
+  </div>
+</div>
+
+<!-- WORKFLOWS -->
+<div class="wrap">
+  <div class="sec-label">La soluzione</div>
+  <div class="sec-title">2 workflow <span>già pronti</span> — ecco come funzionano</div>
+
+  <!-- WF 1 -->
+  <div class="workflow-section">
+    <div class="wf-label">
+      <div class="wf-badge" style="background:#7c3aed;">1</div>
+      <div>
+        <div class="wf-title">Lead Scoring Luxury + CRM Automatico</div>
+        <div class="wf-price">Fase 1 · €20.000 · 8–10 giorni lavorativi</div>
+      </div>
+    </div>
+    <div class="canvas-wrap">
+      <div class="canvas-topbar"><div class="dot-r"></div><div class="dot-y"></div><div class="dot-g"></div><span class="canvas-name">FASE 1 — Lead Scoring Luxury | Barbara Magro Luxury Real Estate</span></div>
+      <div class="canvas">
+        <div class="canvas-inner" id="c1">
+          <svg class="connections" id="svg1"></svg>
+
+          <div class="n8n-node" id="n1_1" style="left:20px;top:82px;">
+            <div class="node-top" style="background:#7c3aed;"></div>
+            <div class="node-body">
+              <div class="node-icon-wrap" style="background:#4c1d9522;">🏡</div>
+              <div class="node-text"><div class="node-name">Ricevi Lead</div><div class="node-sub">Webhook · Sito / Referral</div></div>
+            </div>
+            <div class="port-out"></div>
+          </div>
+
+          <div class="n8n-node" id="n1_2" style="left:210px;top:82px;">
+            <div class="node-top" style="background:#d97706;"></div>
+            <div class="node-body">
+              <div class="node-icon-wrap" style="background:#78350f22;">🧠</div>
+              <div class="node-text"><div class="node-name">Score Lead</div><div class="node-sub">AI · Budget · Zona · Profilo</div></div>
+            </div>
+            <div class="port-in"></div><div class="port-out"></div>
+          </div>
+
+          <div class="n8n-node" id="n1_3" style="left:400px;top:82px;">
+            <div class="node-top" style="background:#2563eb;"></div>
+            <div class="node-body">
+              <div class="node-icon-wrap" style="background:#1e3a8a22;">🔀</div>
+              <div class="node-text"><div class="node-name">Priorità</div><div class="node-sub">Switch · Alta/Media/Bassa</div></div>
+            </div>
+            <div class="port-in"></div><div class="port-out"></div>
+          </div>
+
+          <div class="n8n-node" id="n1_4" style="left:590px;top:40px;">
+            <div class="node-top" style="background:#16a34a;"></div>
+            <div class="node-body">
+              <div class="node-icon-wrap" style="background:#14532d22;">📲</div>
+              <div class="node-text"><div class="node-name">WhatsApp Barbara</div><div class="node-sub">ALTA — notifica istantanea</div></div>
+            </div>
+            <div class="port-in"></div><div class="port-out"></div>
+          </div>
+
+          <div class="n8n-node" id="n1_5" style="left:590px;top:130px;">
+            <div class="node-top" style="background:#0891b2;"></div>
+            <div class="node-body">
+              <div class="node-icon-wrap" style="background:#0c4a6e22;">📋</div>
+              <div class="node-text"><div class="node-name">Email follow-up</div><div class="node-sub">Media/Bassa · entro 2h</div></div>
+            </div>
+            <div class="port-in"></div><div class="port-out"></div>
+          </div>
+
+          <div class="n8n-node" id="n1_6" style="left:780px;top:82px;">
+            <div class="node-top" style="background:#059669;"></div>
+            <div class="node-body">
+              <div class="node-icon-wrap" style="background:#064e3b22;">📊</div>
+              <div class="node-text"><div class="node-name">Salva in CRM</div><div class="node-sub">Google Sheets automatico</div></div>
+            </div>
+            <div class="port-in"></div>
+          </div>
+
+        </div>
+      </div>
+      <div class="results-strip">
+        <div class="res-item"><div class="res-dot" style="background:#7c3aed;"></div>Lead qualificato in &lt;10 secondi</div>
+        <div class="res-item"><div class="res-dot" style="background:#16a34a;"></div>Barbara avvisata in tempo reale sui lead premium</div>
+        <div class="res-item"><div class="res-dot" style="background:#059669;"></div>Pipeline sempre aggiornato automaticamente</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- WF 2 -->
+  <div class="workflow-section">
+    <div class="wf-label">
+      <div class="wf-badge" style="background:#0891b2;">2</div>
+      <div>
+        <div class="wf-title">Property Alerts Personalizzati ai Clienti HNWI</div>
+        <div class="wf-price">Fase 2 · €20.000 · 6–8 giorni lavorativi</div>
+      </div>
+    </div>
+    <div class="canvas-wrap">
+      <div class="canvas-topbar"><div class="dot-r"></div><div class="dot-y"></div><div class="dot-g"></div><span class="canvas-name">FASE 2 — Property Alerts HNWI | Barbara Magro Luxury Real Estate</span></div>
+      <div class="canvas">
+        <div class="canvas-inner" id="c2">
+          <svg class="connections" id="svg2"></svg>
+
+          <div class="n8n-node" id="n2_1" style="left:20px;top:82px;">
+            <div class="node-top" style="background:#d97706;"></div>
+            <div class="node-body">
+              <div class="node-icon-wrap" style="background:#78350f22;">⏰</div>
+              <div class="node-text"><div class="node-name">Ogni mattina 8:00</div><div class="node-sub">Schedule Trigger</div></div>
+            </div>
+            <div class="port-out"></div>
+          </div>
+
+          <div class="n8n-node" id="n2_2" style="left:210px;top:82px;">
+            <div class="node-top" style="background:#059669;"></div>
+            <div class="node-body">
+              <div class="node-icon-wrap" style="background:#064e3b22;">🏠</div>
+              <div class="node-text"><div class="node-name">Nuovi Immobili</div><div class="node-sub">Google Sheets · Portafoglio</div></div>
+            </div>
+            <div class="port-in"></div><div class="port-out"></div>
+          </div>
+
+          <div class="n8n-node" id="n2_3" style="left:400px;top:82px;">
+            <div class="node-top" style="background:#d97706;"></div>
+            <div class="node-body">
+              <div class="node-icon-wrap" style="background:#78350f22;">🔍</div>
+              <div class="node-text"><div class="node-name">Match Profili HNWI</div><div class="node-sub">AI · Budget + Zona + Gusto</div></div>
+            </div>
+            <div class="port-in"></div><div class="port-out"></div>
+          </div>
+
+          <div class="n8n-node" id="n2_4" style="left:590px;top:82px;">
+            <div class="node-top" style="background:#dc2626;"></div>
+            <div class="node-body">
+              <div class="node-icon-wrap" style="background:#7f1d1d22;">📧</div>
+              <div class="node-text"><div class="node-name">Email Luxury</div><div class="node-sub">Gmail · personalizzata</div></div>
+            </div>
+            <div class="port-in"></div><div class="port-out"></div>
+          </div>
+
+          <div class="n8n-node" id="n2_5" style="left:780px;top:82px;">
+            <div class="node-top" style="background:#16a34a;"></div>
+            <div class="node-body">
+              <div class="node-icon-wrap" style="background:#14532d22;">📲</div>
+              <div class="node-text"><div class="node-name">WhatsApp Cliente</div><div class="node-sub">Messaggio esclusivo</div></div>
+            </div>
+            <div class="port-in"></div>
+          </div>
+
+        </div>
+      </div>
+      <div class="results-strip">
+        <div class="res-item"><div class="res-dot" style="background:#0891b2;"></div>Cliente avvisato prima ancora di cercare online</div>
+        <div class="res-item"><div class="res-dot" style="background:#16a34a;"></div>Esperienza esclusiva e proattiva</div>
+        <div class="res-item"><div class="res-dot" style="background:#d97706;"></div>Zero follow-up dimenticati</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- EMAIL PREVIEW -->
+<div class="wrap">
+  <div class="email-preview-wrap">
+    <div class="ep-label">📬 Anteprima — cosa riceve un cliente HNWI ogni mattina alle 8:00</div>
+    <div class="email-card">
+      <h2>🏡 Nuova proprietà selezionata per lei — Barbara Magro Luxury Real Estate</h2>
+      <div class="edate">Generato automaticamente · Inviato alle 8:00 · Selezionato in base al suo profilo</div>
+      <div class="estats">
+        <div class="estat"><div class="en">1</div><div class="el">Proprietà selezionata</div></div>
+        <div class="estat"><div class="en">98%</div><div class="el">Match profilo</div></div>
+        <div class="estat"><div class="en">€2.4M</div><div class="el">Valore stimato</div></div>
+        <div class="estat"><div class="en">Today</div><div class="el">Appena disponibile</div></div>
+      </div>
+      <table class="etable">
+        <thead><tr><th>Proprietà</th><th>Zona</th><th>Caratteristiche</th><th>Stato</th></tr></thead>
+        <tbody>
+          <tr><td>Attico via Montenapoleone</td><td>Centro Milano</td><td><span class="ebadge ebg">350mq · Terrazza</span></td><td>Prima visione esclusiva</td></tr>
+          <tr><td>Villa Lago Como</td><td>Cernobbio</td><td><span class="ebadge ebb">In valutazione</span></td><td>Prossima settimana</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ROI -->
+  <div class="roi-bar">
+    <h3>💰 Ritorno sull'investimento stimato</h3>
+    <div class="roi-items">
+      <div class="roi-i"><div class="rn">3–5h</div><div class="rl">risparmiate a settimana sui follow-up manuali</div></div>
+      <div class="roi-i"><div class="rn">+60%</div><div class="rl">lead luxury contattati entro la prima ora</div></div>
+      <div class="roi-i"><div class="rn">1</div><div class="rl">compravendita extra all'anno copre l'investimento</div></div>
+      <div class="roi-i"><div class="rn">2 mesi</div><div class="rl">tempo stimato di break-even</div></div>
+    </div>
+  </div>
+
+  <div style="height:32px;"></div>
+
+  <!-- CALENDAR -->
+  <div class="cal-box">
+    <h2>📅 Prenota una chiamata di 20 minuti</h2>
+    <p class="sub">Scegli il giorno e l'orario che preferisci — ti confirmiamo subito</p>
+
+    <div style="text-align:center;margin-bottom:24px;">
+      <button id="openCalBtn" onclick="openCalendar()" style="background:#0f172a;color:#fff;border:none;padding:16px 36px;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;box-shadow:0 4px 16px rgba(15,23,42,0.3);transition:all 0.2s;" onmouseover="this.style.background='#1e293b'" onmouseout="this.style.background='#0f172a'">
+        📅 Scegli data e orario →
+      </button>
+    </div>
+
+    <div id="calendarSlots" style="display:none;">
+      <div class="slots-grid">
+        <div class="slot-card" onclick="selectSlot(this, 'Lunedì 19 Maggio', '10:00–10:20')">
+          <div class="day-name">Lunedì</div>
+          <div class="day-num">19</div>
+          <div class="month">Maggio</div>
+          <div class="time">10:00</div>
+          <div class="dur">20 minuti</div>
+        </div>
+        <div class="slot-card" onclick="selectSlot(this, 'Martedì 20 Maggio', '10:00–10:20')">
+          <div class="day-name">Martedì</div>
+          <div class="day-num">20</div>
+          <div class="month">Maggio</div>
+          <div class="time">10:00</div>
+          <div class="dur">20 minuti</div>
+        </div>
+        <div class="slot-card" onclick="selectSlot(this, 'Mercoledì 21 Maggio', '10:00–10:20')">
+          <div class="day-name">Mercoledì</div>
+          <div class="day-num">21</div>
+          <div class="month">Maggio</div>
+          <div class="time">10:00</div>
+          <div class="dur">20 minuti</div>
+        </div>
+        <div class="slot-card" onclick="selectSlot(this, 'Giovedì 22 Maggio', '10:00–10:20')">
+          <div class="day-name">Giovedì</div>
+          <div class="day-num">22</div>
+          <div class="month">Maggio</div>
+          <div class="time">10:00</div>
+          <div class="dur">20 minuti</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="confirm-area" id="confirmArea">
+      <h3 id="confirmTitle">✅ Hai scelto: —</h3>
+      <div class="form-row">
+        <input class="form-input" id="fname" type="text" placeholder="Il tuo nome" />
+        <input class="form-input" id="fphone" type="tel" placeholder="Il tuo numero di telefono" />
+      </div>
+      <input class="form-input" id="femail" type="email" placeholder="La tua email" style="margin-bottom:12px;" />
+      <button class="confirm-btn" onclick="confirmBooking()">Conferma prenotazione →</button>
+    </div>
+
+    <div class="cta-note">Investimento: <strong>€40.000</strong> · 2 fasi da €20.000 · stop senza penali dopo ogni fase</div>
+  </div>
+</div>
+
+<div style="height:52px;"></div>
+
+<script>
+function drawConnections(canvasId, svgId, connections) {
+  const canvas = document.getElementById(canvasId);
+  const svg = document.getElementById(svgId);
+  if (!canvas || !svg) return;
+  svg.innerHTML = '';
+  svg.setAttribute('width', canvas.offsetWidth);
+  svg.setAttribute('height', canvas.offsetHeight);
+  connections.forEach(([fromId, toId]) => {
+    const from = document.getElementById(fromId);
+    const to = document.getElementById(toId);
+    if (!from || !to) return;
+    const fx = from.offsetLeft + from.offsetWidth;
+    const fy = from.offsetTop + from.offsetHeight / 2;
+    const tx = to.offsetLeft;
+    const ty = to.offsetTop + to.offsetHeight / 2;
+    const cx = (fx + tx) / 2;
+    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    path.setAttribute('d', `M${fx},${fy} C${cx},${fy} ${cx},${ty} ${tx},${ty}`);
+    path.setAttribute('stroke', '#6366f1');
+    path.setAttribute('stroke-width', '2');
+    path.setAttribute('fill', 'none');
+    path.setAttribute('opacity', '0.7');
+    const angle = Math.atan2(ty - fy, tx - fx);
+    const arrowSize = 6;
+    const ax = tx - arrowSize * Math.cos(angle - 0.4);
+    const ay = ty - arrowSize * Math.sin(angle - 0.4);
+    const bx = tx - arrowSize * Math.cos(angle + 0.4);
+    const by = ty - arrowSize * Math.sin(angle + 0.4);
+    const arrow = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+    arrow.setAttribute('points', `${tx},${ty} ${ax},${ay} ${bx},${by}`);
+    arrow.setAttribute('fill', '#6366f1');
+    arrow.setAttribute('opacity', '0.9');
+    svg.appendChild(path);
+    svg.appendChild(arrow);
+  });
+}
+
+function initAll() {
+  drawConnections('c1','svg1',[['n1_1','n1_2'],['n1_2','n1_3'],['n1_3','n1_4'],['n1_3','n1_5'],['n1_4','n1_6'],['n1_5','n1_6']]);
+  drawConnections('c2','svg2',[['n2_1','n2_2'],['n2_2','n2_3'],['n2_3','n2_4'],['n2_4','n2_5']]);
+}
+
+window.addEventListener('load', initAll);
+window.addEventListener('resize', initAll);
+
+let selectedSlot = null;
+
+function openCalendar() {
+  document.getElementById('openCalBtn').style.display = 'none';
+  const slots = document.getElementById('calendarSlots');
+  slots.style.display = 'block';
+  slots.style.opacity = '0';
+  slots.style.transform = 'translateY(12px)';
+  slots.style.transition = 'all 0.35s ease';
+  requestAnimationFrame(() => {
+    slots.style.opacity = '1';
+    slots.style.transform = 'translateY(0)';
+  });
+}
+
+function selectSlot(el, day, time) {
+  document.querySelectorAll('.slot-card').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedSlot = { day, time };
+  const area = document.getElementById('confirmArea');
+  area.classList.add('show');
+  document.getElementById('confirmTitle').textContent = '✅ Hai scelto: ' + day + ' ore ' + time;
+  area.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function confirmBooking() {
+  const name = document.getElementById('fname').value.trim();
+  const phone = document.getElementById('fphone').value.trim();
+  const email = document.getElementById('femail').value.trim();
+  if (!name || !phone) { alert('Inserisci nome e numero di telefono per confermare.'); return; }
+  if (!selectedSlot) return;
+
+  const subject = encodeURIComponent('PRENOTAZIONE Barbara Magro — ' + selectedSlot.day + ' ' + selectedSlot.time);
+  const body = encodeURIComponent(
+    'Nuova prenotazione!\n\n' +
+    'Giorno: ' + selectedSlot.day + '\n' +
+    'Orario: ' + selectedSlot.time + '\n' +
+    'Nome: ' + name + '\n' +
+    'Telefono: ' + phone + '\n' +
+    (email ? 'Email: ' + email + '\n' : '')
+  );
+  window.location.href = 'mailto:elfuerte2014.jqs@gmail.com?subject=' + subject + '&body=' + body;
+
+  const area = document.getElementById('confirmArea');
+  area.innerHTML = '<div style="text-align:center;padding:16px 0;">' +
+    '<div style="font-size:48px;margin-bottom:12px;">✅</div>' +
+    '<h3 style="font-size:18px;color:#059669;margin-bottom:6px;">Prenotazione confermata!</h3>' +
+    '<p style="color:#64748b;font-size:14px;">' + selectedSlot.day + ' — ore ' + selectedSlot.time + '<br>Ti contatteremo al numero <strong>' + phone + '</strong></p>' +
+    '</div>';
+}
+</script>
+</body>
+</html>
