@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Proposta Automatizzazioni n8n — Engel & Völkers Milano</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; background: #f8fafc; color: #0f172a; }
+
+  /* HERO */
+  .hero { background: linear-gradient(135deg, #0f172a, #1e293b); padding: 52px 48px; }
+  .hero-tag { display: inline-block; background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.2); color: #cbd5e1; font-size: 11px; font-weight: 700; padding: 4px 14px; border-radius: 20px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 18px; }
+  .hero h1 { font-size: 36px; font-weight: 800; color: #fff; line-height: 1.15; max-width: 600px; }
+  .hero h1 span { color: #fbbf24; }
+  .hero p { color: #94a3b8; font-size: 16px; margin-top: 12px; max-width: 520px; line-height: 1.6; }
+  .hero-chips { display: flex; gap: 12px; margin-top: 28px; flex-wrap: wrap; }
+  .hchip { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.18); color: #e2e8f0; padding: 8px 16px; border-radius: 8px; font-size: 13px; }
+  .hchip strong { color: #fbbf24; }
+
+  /* SECTION */
+  .wrap { max-width: 860px; margin: 0 auto; padding: 0 40px; }
+  .sec-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: #b45309; margin-bottom: 8px; }
+  .sec-title { font-size: 24px; font-weight: 800; color: #0f172a; margin-bottom: 24px; }
+  .sec-title span { color: #92400e; }
+
+  /* PROBLEM CARDS */
+  .problems { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; margin-bottom: 52px; }
+  .prob { background: #fff; border: 1px solid #e2e8f0; border-radius: 14px; padding: 22px; }
+  .prob .ico { font-size: 28px; margin-bottom: 10px; }
+  .prob h3 { font-size: 14px; font-weight: 700; margin-bottom: 6px; }
+  .prob p { font-size: 13px; color: #64748b; line-height: 1.5; }
+  .prob .cost { font-size: 12px; color: #ef4444; font-weight: 600; margin-top: 10px; }
+
+  /* N8N CANVAS */
+  .workflow-section { margin-bottom: 40px; }
+  .wf-label { display: flex; align-items: center; gap: 14px; margin-bottom: 16px; }
+  .wf-badge { width: 32px; height: 32px; border-radius: 50%; color: #fff; font-weight: 800; font-size: 14px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .wf-title { font-size: 16px; font-weight: 700; color: #0f172a; }
+  .wf-price { font-size: 13px; color: #64748b; }
+
+  .canvas-wrap { background: #1a1a2e; border-radius: 16px; overflow: hidden; border: 1px solid #2d2d4e; }
+  .canvas-topbar { background: #13132a; padding: 10px 18px; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid #2d2d4e; }
+  .dot-r { width: 10px; height: 10px; border-radius: 50%; background: #ff5f57; }
+  .dot-y { width: 10px; height: 10px; border-radius: 50%; background: #febc2e; }
+  .dot-g { width: 10px; height: 10px; border-radius: 50%; background: #28c840; }
+  .canvas-name { font-size: 12px; color: #6b7280; margin-left: 8px; }
+
+  .canvas { position: relative; width: 100%; overflow-x: auto; }
+  .canvas-inner { position: relative; min-width: 820px; height: 220px; }
+  .canvas-inner { background-image: radial-gradient(circle, #2d2d4e 1px, transparent 1px); background-size: 24px 24px; }
+
+  .n8n-node { position: absolute; width: 160px; background: #1e1e3f; border: 1px solid #3d3d6b; border-radius: 10px; overflow: hidden; cursor: default; box-shadow: 0 4px 20px rgba(0,0,0,0.4); }
+  .n8n-node:hover { border-color: #6366f1; box-shadow: 0 4px 20px rgba(99,102,241,0.3); }
+  .node-top { height: 5px; }
+  .node-body { padding: 10px 12px; display: flex; align-items: center; gap: 10px; }
+  .node-icon-wrap { width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+  .node-text { flex: 1; min-width: 0; }
+  .node-name { font-size: 11px; font-weight: 700; color: #e2e8f0; line-height: 1.3; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .node-sub { font-size: 10px; color: #6b7280; margin-top: 2px; }
+
+  .port-in { position: absolute; left: -5px; top: 50%; transform: translateY(-50%); width: 10px; height: 10px; border-radius: 50%; background: #3d3d6b; border: 2px solid #6366f1; }
+  .port-out { position: absolute; right: -5px; top: 50%; transform: translateY(-50%); width: 10px; height: 10px; border-radius: 50%; background: #3d3d6b; border: 2px solid #6366f1; }
+
+  .connections { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; }
+
+  .results-strip { background: #13132a; padding: 12px 20px; display: flex; gap: 16px; flex-wrap: wrap; }
+  .res-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: #94a3b8; }
+  .res-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+
+  /* EMAIL PREVIEW */
+  .email-preview-wrap { background: #f1f5f9; border-radius: 16px; padding: 24px; margin-bottom: 40px; }
+  .ep-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #64748b; margin-bottom: 14px; }
+  .email-card { background: #fff; border-radius: 12px; padding: 28px; border: 1px solid #e2e8f0; font-family: Arial, sans-serif; }
+  .email-card h2 { color: #0f172a; font-size: 18px; }
+  .email-card .edate { color: #94a3b8; font-size: 12px; margin-top: 4px; }
+  .estats { display: flex; gap: 10px; margin: 18px 0; flex-wrap: wrap; }
+  .estat { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 12px 16px; text-align: center; flex: 1; min-width: 80px; }
+  .estat .en { font-size: 22px; font-weight: 800; color: #92400e; }
+  .estat .el { font-size: 11px; color: #94a3b8; }
+  .etable { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .etable th { background: #0f172a; color: #fff; padding: 8px 12px; text-align: left; font-size: 12px; }
+  .etable td { padding: 8px 12px; border-bottom: 1px solid #f1f5f9; }
+  .ebadge { display: inline-block; padding: 2px 8px; border-radius: 9999px; font-size: 11px; font-weight: 600; }
+  .ebg { background: #dcfce7; color: #166534; }
+  .ebb { background: #fef3c7; color: #92400e; }
+  .ebc { background: #dbeafe; color: #1e40af; }
+
+  /* ROI */
+  .roi-bar { background: #0f172a; border-radius: 16px; padding: 32px; margin-bottom: 40px; }
+  .roi-bar h3 { color: #fff; font-size: 18px; font-weight: 700; margin-bottom: 20px; }
+  .roi-items { display: grid; grid-template-columns: repeat(4,1fr); gap: 14px; }
+  .roi-i { background: rgba(255,255,255,0.08); border-radius: 12px; padding: 18px; text-align: center; }
+  .roi-i .rn { font-size: 26px; font-weight: 900; color: #fbbf24; }
+  .roi-i .rl { font-size: 11px; color: #94a3b8; margin-top: 4px; line-height: 1.4; }
+
+  /* CALENDAR */
+  .cal-box { background: #fff; border: 2px solid #0f172a; border-radius: 20px; padding: 36px; margin-bottom: 52px; }
+  .cal-box h2 { font-size: 22px; font-weight: 800; text-align: center; }
+  .cal-box .sub { color: #64748b; font-size: 14px; text-align: center; margin-top: 6px; margin-bottom: 28px; }
+  .slots-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 24px; max-width: 600px; margin-left: auto; margin-right: auto; }
+  .slot-card { border: 2px solid #e2e8f0; border-radius: 14px; padding: 14px 10px; text-align: center; cursor: pointer; transition: all 0.18s; }
+  .slot-card:hover { border-color: #0f172a; background: #f8fafc; transform: translateY(-2px); }
+  .slot-card.selected { border-color: #0f172a; background: #0f172a; color: #fff; transform: translateY(-2px); box-shadow: 0 4px 16px rgba(15,23,42,0.3); }
+  .slot-card .day-name { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.7px; color: #64748b; }
+  .slot-card.selected .day-name { color: #94a3b8; }
+  .slot-card .day-num { font-size: 28px; font-weight: 900; color: #0f172a; margin: 4px 0; }
+  .slot-card.selected .day-num { color: #fff; }
+  .slot-card .month { font-size: 11px; color: #94a3b8; }
+  .slot-card.selected .month { color: #64748b; }
+  .slot-card .time { font-size: 13px; font-weight: 700; color: #92400e; margin-top: 8px; background: #fef3c7; border-radius: 6px; padding: 4px 6px; }
+  .slot-card.selected .time { color: #fbbf24; background: rgba(251,191,36,0.15); }
+  .slot-card .dur { font-size: 10px; color: #94a3b8; margin-top: 3px; }
+  .slot-card.selected .dur { color: #64748b; }
+
+  .confirm-area { display: none; background: #f8fafc; border-radius: 14px; padding: 24px; margin-top: 4px; }
+  .confirm-area.show { display: block; }
+  .confirm-area h3 { font-size: 15px; font-weight: 700; margin-bottom: 16px; }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+  .form-input { width: 100%; padding: 10px 14px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 14px; outline: none; font-family: inherit; }
+  .form-input:focus { border-color: #0f172a; box-shadow: 0 0 0 3px rgba(15,23,42,0.1); }
+  .confirm-btn { width: 100%; background: #0f172a; color: #fff; border: none; padding: 13px; border-radius: 10px; font-weight: 700; font-size: 15px; cursor: pointer; margin-top: 4px; }
+  .confirm-btn:hover { background: #1e293b; }
+  .cta-note { font-size: 12px; color: #94a3b8; text-align: center; margin-top: 14px; }
+
+  .spacer { height: 48px; }
+  @media(max-width:640px){ .problems,.roi-items{ grid-template-columns:1fr; } .wrap{ padding:0 20px; } }
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="wrap">
+    <div style="font-size:11px;font-weight:700;letter-spacing:4px;text-transform:uppercase;color:#fbbf24;margin-bottom:8px;">SALAZAR PARTNERS</div>
+    <div class="hero-tag">Proposta personalizzata · Engel &amp; Völkers · Milano</div>
+    <h1>Automatizzate la gestione<br>dei lead immobiliari <span>con n8n</span></h1>
+    <p>3 workflow attivi in 5 settimane che eliminano la qualificazione manuale, accelerano il contatto con i lead e generano i report per la direzione in automatico.</p>
+    <div class="hero-chips">
+      <div class="hchip">💰 <strong>€81.000</strong> · 3 fasi da €27.000</div>
+      <div class="hchip">📅 <strong>3 fasi</strong> · 5 settimane totali</div>
+      <div class="hchip">⚡ Fase 1 attiva in <strong>8–10 giorni</strong></div>
+      <div class="hchip">🔒 Stop senza penali dopo ogni fase</div>
+    </div>
+  </div>
+</div>
+
+<div class="spacer"></div>
+
+<!-- PROBLEMS -->
+<div class="wrap">
+  <div class="sec-label">Il problema oggi</div>
+  <div class="sec-title">Ore perse ogni giorno in processi <span>che si automatizzano</span></div>
+  <div class="problems">
+    <div class="prob">
+      <div class="ico">📥</div>
+      <h3>Lead qualificati a mano</h3>
+      <p>Ogni contatto da Idealista, Immobiliare.it o dal sito viene valutato manualmente. Lento, inconsistente, dipendente dall'agente.</p>
+      <div class="cost">~1 ora/giorno per agente sprecata</div>
+    </div>
+    <div class="prob">
+      <div class="ico">⏱️</div>
+      <h3>Risposta lenta ai lead</h3>
+      <p>In media i lead vengono contattati dopo ore. In questo mercato, chi risponde per primo converte. Ogni ora di ritardo costa un cliente.</p>
+      <div class="cost">Conversioni perse ogni settimana</div>
+    </div>
+    <div class="prob">
+      <div class="ico">📊</div>
+      <h3>Report agenti manuali</h3>
+      <p>Il direttore raccoglie dati a mano, costruisce la tabella e prepara la review settimanale. Tempo sottratto alla gestione strategica.</p>
+      <div class="cost">~3 ore/settimana sprecate</div>
+    </div>
+  </div>
+</div>
+
+<!-- WORKFLOWS -->
+<div class="wrap">
+  <div class="sec-label">La soluzione</div>
+  <div class="sec-title">3 workflow <span>già pronti</span> — ecco come funzionano</div>
+
+  <!-- WF 1 -->
+  <div class="workflow-section">
+    <div class="wf-label">
+      <div class="wf-badge" style="background:#7c3aed;">1</div>
+      <div>
+        <div class="wf-title">Lead Scoring Automatico + Assegnazione Agente</div>
+        <div class="wf-price">Fase 1 · €27.000 · 8–10 giorni lavorativi</div>
+      </div>
+    </div>
+    <div class="canvas-wrap">
+      <div class="canvas-topbar"><div class="dot-r"></div><div class="dot-y"></div><div class="dot-g"></div><span class="canvas-name">FASE 1 — Lead Scoring Automatico | Engel &amp; Völkers Milano</span></div>
+      <div class="canvas">
+        <div class="canvas-inner" id="c1">
+          <svg class="connections" id="svg1"></svg>
+
+          <div class="n8n-node" id="n1_1" style="left:20px;top:82px;">
+            <div class="node-top" style="background:#7c3aed;"></div>
+            <div class="node-body">
+              <div class="node-icon-wrap" style="background:#4c1d9522;">🏠</div>
+              <div class="node-text"><div class="node-name">Ricevi Lead</div><div class="node-sub">Webhook · Idealista / sito</div></div>
+            </div>
+            <div class="port-out"></div>
+          </div>
+
+          <div class="n8n-node" id="n1_2" style="left:210px;top:82px;">
+            <div class="node-top" style="background:#d97706;"></div>
+            <div class="node-body">
+              <div class="node-icon-wrap" style="background:#78350f22;">🧠</div>
+              <div class="node-text"><div class="node-name">Score Lead</div><div class="node-sub">Code · Budget · Zona · Tipo</div></div>
+            </div>
+            <div class="port-in"></div><div class="port-out"></div>
+          </div>
+
+          <div class="n8n-node" id="n1_3" style="left:400px;top:82px;">
+            <div class="node-top" style="background:#2563eb;"></div>
+            <div class="node-body">
+              <div class="node-icon-wrap" style="background:#1e3a8a22;">🔀</div>
+              <div class="node-text"><div class="node-name">Priorità</div><div class="node-sub">Switch · Alta/Media/Bassa</div></div>
+            </div>
+            <div class="port-in"></div><div class="port-out"></div>
+          </div>
+
+          <div class="n8n-node" id="n1_4" style="left:590px;top:40px;">
+            <div class="node-top" style="background:#16a34a;"></div>
+            <div class="node-body">
+              <div class="node-icon-wrap" style="background:#14532d22;">📲</div>
+              <div class="node-text"><div class="node-name">WhatsApp Agente</div><div class="node-sub">ALTA — notifica istantanea</div></div>
+            </div>
+            <div class="port-in"></div><div class="port-out"></div>
+          </div>
+
+          <div class="n8n-node" id="n1_5" style="left:590px;top:130px;">
+            <div class="node-top" style="background:#0891b2;"></div>
+            <div class="node-body">
+              <div class="node-icon-wrap" style="background:#0c4a6e22;">📋</div>
+              <div class="node-text"><div class="node-name">Coda Media/Bassa</div><div class="node-sub">Email team · entro 30 min</div></div>
+            </div>
+            <div class="port-in"></div><div class="port-out"></div>
+          </div>
+
+          <div class="n8n-node" id="n1_6" style="left:780px;top:82px;">
+            <div class="node-top" style="background:#059669;"></div>
+            <div class="node-body">
+              <div class="node-icon-wrap" style="background:#064e3b22;">📊</div>
+              <div class="node-text"><div class="node-name">Salva in CRM</div><div class="node-sub">Google Sheets / CRM</div></div>
+            </div>
+            <div class="port-in"></div>
+          </div>
+
+        </div>
+      </div>
+      <div class="results-strip">
+        <div class="res-item"><div class="res-dot" style="background:#7c3aed;"></div>Lead qualificato in &lt;10 secondi</div>
+        <div class="res-item"><div class="res-dot" style="background:#16a34a;"></div>Agente giusto contatta subito</div>
+        <div class="res-item"><div class="res-dot" style="background:#059669;"></div>Pipeline sempre aggiornato</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- WF 2 -->
+  <div class="workflow-section">
+    <div class="wf-label">
+      <div class="wf-badge" style="background:#0891b2;">2</div>
+      <div>
+        <div class="wf-title">Property Alerts Automatici agli Acquirenti</div>
+        <div class="wf-price">Fase 2 · €27.000 · 6–8 giorni lavorativi</div>
+      </div>
+    </div>
+    <div class="canvas-wrap">
+      <div class="canvas-topbar"><div class="dot-r"></div><div class="dot-y"></div><div class="dot-g"></div><span class="canvas-name">FASE 2 — Property Alerts Automatici | Engel &amp; Völkers Milano</span></div>
+      <div class="canvas">
+        <div class="canvas-inner" id="c2">
+          <svg class="connections" id="svg2"></svg>
+
+          <div class="n8n-node" id="n2_1" style="left:20px;top:82px;">
+            <div class="node-top" style="background:#d97706;"></div>
+            <div class="node-body">
+              <div class="node-icon-wrap" style="background:#78350f22;">⏰</div>
+              <div class="node-text"><div class="node-name">Ogni mattina 8:30</div><div class="node-sub">Schedule Trigger</div></div>
+            </div>
+            <div class="port-out"></div>
+          </div>
+
+          <div class="n8n-node" id="n2_2" style="left:210px;top:82px;">
+            <div class="node-top" style="background:#059669;"></div>
+            <div class="node-body">
+              <div class="node-icon-wrap" style="background:#064e3b22;">📋</div>
+              <div class="node-text"><div class="node-name">Nuovi Immobili</div><div class="node-sub">Google Sheets / CRM</div></div>
+            </div>
+            <div class="port-in"></div><div class="port-out"></div>
+          </div>
+
+          <div class="n8n-node" id="n2_3" style="left:400px;top:82px;">
+            <div class="node-top" style="background:#d97706;"></div>
+            <div class="node-body">
+              <div class="node-icon-wrap" style="background:#78350f22;">🔍</div>
+              <div class="node-text"><div class="node-name">Match Profili</div><div class="node-sub">Code · Budget + Zona + Tipo</div></div>
+            </div>
+            <div class="port-in"></div><div class="port-out"></div>
+          </div>
+
+          <div class="n8n-node" id="n2_4" style="left:590px;top:82px;">
+            <div class="node-top" style="background:#dc2626;"></div>
+            <div class="node-body">
+              <div class="node-icon-wrap" style="background:#7f1d1d22;">📧</div>
+              <div class="node-text"><div class="node-name">Email Personalizzata</div><div class="node-sub">Gmail · con foto immobile</div></div>
+            </div>
+            <div class="port-in"></div><div class="port-out"></div>
+          </div>
+
+          <div class="n8n-node" id="n2_5" style="left:780px;top:82px;">
+            <div class="node-top" style="background:#16a34a;"></div>
+            <div class="node-body">
+              <div class="node-icon-wrap" style="background:#14532d22;">📲</div>
+              <div class="node-text"><div class="node-name">WhatsApp Acquirente</div><div class="node-sub">Messaggio personalizzato</div></div>
+            </div>
+            <div class="port-in"></div>
+          </div>
+
+        </div>
+      </div>
+      <div class="results-strip">
+        <div class="res-item"><div class="res-dot" style="background:#0891b2;"></div>Cliente avvisato prima ancora che l'agente apra la mail</div>
+        <div class="res-item"><div class="res-dot" style="background:#16a34a;"></div>Zero follow-up dimenticati</div>
+        <div class="res-item"><div class="res-dot" style="background:#d97706;"></div>Esperienza cliente premium</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- WF 3 -->
+  <div class="workflow-section">
+    <div class="wf-label">
+      <div class="wf-badge" style="background:#92400e;">3</div>
+      <div>
+        <div class="wf-title">Report Performance Agenti per la Direzione</div>
+        <div class="wf-price">Fase 3 · €27.000 · 6–8 giorni lavorativi</div>
+      </div>
+    </div>
+    <div class="canvas-wrap">
+      <div class="canvas-topbar"><div class="dot-r"></div><div class="dot-y"></div><div class="dot-g"></div><span class="canvas-name">FASE 3 — Report Direzione Settimanale | Engel &amp; Völkers Milano</span></div>
+      <div class="canvas">
+        <div class="canvas-inner" id="c3">
+          <svg class="connections" id="svg3"></svg>
+
+          <div class="n8n-node" id="n3_1" style="left:20px;top:82px;">
+            <div class="node-top" style="background:#d97706;"></div>
+            <div class="node-body">
+              <div class="node-icon-wrap" style="background:#78350f22;">⏰</div>
+              <div class="node-text"><div class="node-name">Lunedì alle 7:30</div><div class="node-sub">Schedule Trigger</div></div>
+            </div>
+            <div class="port-out"></div>
+          </div>
+
+          <div class="n8n-node" id="n3_2" style="left:210px;top:82px;">
+            <div class="node-top" style="background:#059669;"></div>
+            <div class="node-body">
+              <div class="node-icon-wrap" style="background:#064e3b22;">📋</div>
+              <div class="node-text"><div class="node-name">Leggi Pipeline</div><div class="node-sub">Google Sheets / CRM</div></div>
+            </div>
+            <div class="port-in"></div><div class="port-out"></div>
+          </div>
+
+          <div class="n8n-node" id="n3_3" style="left:400px;top:82px;">
+            <div class="node-top" style="background:#d97706;"></div>
+            <div class="node-body">
+              <div class="node-icon-wrap" style="background:#78350f22;">🧠</div>
+              <div class="node-text"><div class="node-name">Genera Report HTML</div><div class="node-sub">Code · KPI per agente</div></div>
+            </div>
+            <div class="port-in"></div><div class="port-out"></div>
+          </div>
+
+          <div class="n8n-node" id="n3_4" style="left:590px;top:82px;">
+            <div class="node-top" style="background:#dc2626;"></div>
+            <div class="node-body">
+              <div class="node-icon-wrap" style="background:#7f1d1d22;">📧</div>
+              <div class="node-text"><div class="node-name">Email Direzione</div><div class="node-sub">Gmail · HTML professionale</div></div>
+            </div>
+            <div class="port-in"></div><div class="port-out"></div>
+          </div>
+
+          <div class="n8n-node" id="n3_5" style="left:780px;top:82px;">
+            <div class="node-top" style="background:#0891b2;"></div>
+            <div class="node-body">
+              <div class="node-icon-wrap" style="background:#0c4a6e22;">📲</div>
+              <div class="node-text"><div class="node-name">Notifica Team</div><div class="node-sub">Telegram</div></div>
+            </div>
+            <div class="port-in"></div>
+          </div>
+
+        </div>
+      </div>
+      <div class="results-strip">
+        <div class="res-item"><div class="res-dot" style="background:#92400e;"></div>3 ore/settimana risparmiate per la direzione</div>
+        <div class="res-item"><div class="res-dot" style="background:#16a34a;"></div>KPI agenti sempre visibili</div>
+        <div class="res-item"><div class="res-dot" style="background:#0891b2;"></div>Report pronto prima dell'apertura delle sedi</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- EMAIL PREVIEW -->
+<div class="wrap">
+  <div class="email-preview-wrap">
+    <div class="ep-label">📬 Anteprima — cosa riceve la direzione ogni lunedì mattina alle 7:30</div>
+    <div class="email-card">
+      <h2>📊 Performance Report — Engel &amp; Völkers Milano · Settimana 27 apr – 3 mag</h2>
+      <div class="edate">Generato automaticamente · Inviato alle 7:30 · Dati aggiornati in tempo reale</div>
+      <div class="estats">
+        <div class="estat"><div class="en">34</div><div class="el">Lead ricevuti</div></div>
+        <div class="estat"><div class="en">28</div><div class="el">Qualificati</div></div>
+        <div class="estat"><div class="en">6</div><div class="el">Trattative aperte</div></div>
+        <div class="estat"><div class="en">2</div><div class="el">Compromessi</div></div>
+      </div>
+      <table class="etable">
+        <thead><tr><th>Agente</th><th>Lead gestiti</th><th>Trattative</th><th>Stato</th></tr></thead>
+        <tbody>
+          <tr><td>Lorenzo Ferretti</td><td>12</td><td><span class="ebadge ebg">3 aperte</span></td><td>Top performer</td></tr>
+          <tr><td>Valentina Ricci</td><td>9</td><td><span class="ebadge ebb">2 aperte</span></td><td>In target</td></tr>
+          <tr><td>Marco Bianchi</td><td>7</td><td><span class="ebadge ebc">1 aperta</span></td><td>Da supportare</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ROI -->
+  <div class="roi-bar">
+    <h3>💰 Ritorno sull'investimento stimato</h3>
+    <div class="roi-items">
+      <div class="roi-i"><div class="rn">5–8h</div><div class="rl">risparmiate a settimana per agente</div></div>
+      <div class="roi-i"><div class="rn">+40%</div><div class="rl">lead contattati entro la prima ora</div></div>
+      <div class="roi-i"><div class="rn">1</div><div class="rl">compravendita extra al mese copre l'investimento</div></div>
+      <div class="roi-i"><div class="rn">3 mesi</div><div class="rl">tempo stimato di break-even</div></div>
+    </div>
+  </div>
+
+  <div style="height:32px;"></div>
+
+  <!-- CALENDAR -->
+  <div class="cal-box">
+    <h2>📅 Prenota una chiamata di 20 minuti</h2>
+    <p class="sub">Scegli il giorno e l'orario che preferisci — ti confermiamo subito</p>
+
+    <div style="text-align:center;margin-bottom:24px;">
+      <button id="openCalBtn" onclick="openCalendar()" style="background:#0f172a;color:#fff;border:none;padding:16px 36px;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;box-shadow:0 4px 16px rgba(15,23,42,0.3);transition:all 0.2s;" onmouseover="this.style.background='#1e293b'" onmouseout="this.style.background='#0f172a'">
+        📅 Scegli data e orario →
+      </button>
+    </div>
+
+    <div id="calendarSlots" style="display:none;">
+      <div class="slots-grid">
+        <div class="slot-card" onclick="selectSlot(this, 'Mercoledì 13 Maggio', '9:30–9:50')">
+          <div class="day-name">Mercoledì</div>
+          <div class="day-num">13</div>
+          <div class="month">Maggio</div>
+          <div class="time">9:30</div>
+          <div class="dur">20 minuti</div>
+        </div>
+        <div class="slot-card" onclick="selectSlot(this, 'Giovedì 14 Maggio', '9:30–9:50')">
+          <div class="day-name">Giovedì</div>
+          <div class="day-num">14</div>
+          <div class="month">Maggio</div>
+          <div class="time">9:30</div>
+          <div class="dur">20 minuti</div>
+        </div>
+        <div class="slot-card" onclick="selectSlot(this, 'Venerdì 15 Maggio', '9:30–9:50')">
+          <div class="day-name">Venerdì</div>
+          <div class="day-num">15</div>
+          <div class="month">Maggio</div>
+          <div class="time">9:30</div>
+          <div class="dur">20 minuti</div>
+        </div>
+        <div class="slot-card" onclick="selectSlot(this, 'Lunedì 18 Maggio', '9:30–9:50')">
+          <div class="day-name">Lunedì</div>
+          <div class="day-num">18</div>
+          <div class="month">Maggio</div>
+          <div class="time">9:30</div>
+          <div class="dur">20 minuti</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="confirm-area" id="confirmArea">
+      <h3 id="confirmTitle">✅ Hai scelto: —</h3>
+      <div class="form-row">
+        <input class="form-input" id="fname" type="text" placeholder="Il tuo nome" />
+        <input class="form-input" id="fphone" type="tel" placeholder="Il tuo numero di telefono" />
+      </div>
+      <input class="form-input" id="femail" type="email" placeholder="La tua email" style="margin-bottom:12px;" />
+      <button class="confirm-btn" onclick="confirmBooking()">Conferma prenotazione →</button>
+    </div>
+
+    <div class="cta-note">Investimento: <strong>€81.000</strong> · 3 fasi da €27.000 · stop senza penali dopo ogni fase</div>
+  </div>
+</div>
+
+<div style="height:52px;"></div>
+
+<script>
+function drawConnections(canvasId, svgId, connections) {
+  const canvas = document.getElementById(canvasId);
+  const svg = document.getElementById(svgId);
+  if (!canvas || !svg) return;
+  svg.innerHTML = '';
+  svg.setAttribute('width', canvas.offsetWidth);
+  svg.setAttribute('height', canvas.offsetHeight);
+  connections.forEach(([fromId, toId]) => {
+    const from = document.getElementById(fromId);
+    const to = document.getElementById(toId);
+    if (!from || !to) return;
+    const fx = from.offsetLeft + from.offsetWidth;
+    const fy = from.offsetTop + from.offsetHeight / 2;
+    const tx = to.offsetLeft;
+    const ty = to.offsetTop + to.offsetHeight / 2;
+    const cx = (fx + tx) / 2;
+    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    path.setAttribute('d', `M${fx},${fy} C${cx},${fy} ${cx},${ty} ${tx},${ty}`);
+    path.setAttribute('stroke', '#6366f1');
+    path.setAttribute('stroke-width', '2');
+    path.setAttribute('fill', 'none');
+    path.setAttribute('opacity', '0.7');
+    const angle = Math.atan2(ty - fy, tx - fx);
+    const arrowSize = 6;
+    const ax = tx - arrowSize * Math.cos(angle - 0.4);
+    const ay = ty - arrowSize * Math.sin(angle - 0.4);
+    const bx = tx - arrowSize * Math.cos(angle + 0.4);
+    const by = ty - arrowSize * Math.sin(angle + 0.4);
+    const arrow = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+    arrow.setAttribute('points', `${tx},${ty} ${ax},${ay} ${bx},${by}`);
+    arrow.setAttribute('fill', '#6366f1');
+    arrow.setAttribute('opacity', '0.9');
+    svg.appendChild(path);
+    svg.appendChild(arrow);
+  });
+}
+
+function initAll() {
+  drawConnections('c1','svg1',[['n1_1','n1_2'],['n1_2','n1_3'],['n1_3','n1_4'],['n1_3','n1_5'],['n1_4','n1_6'],['n1_5','n1_6']]);
+  drawConnections('c2','svg2',[['n2_1','n2_2'],['n2_2','n2_3'],['n2_3','n2_4'],['n2_4','n2_5']]);
+  drawConnections('c3','svg3',[['n3_1','n3_2'],['n3_2','n3_3'],['n3_3','n3_4'],['n3_4','n3_5']]);
+}
+
+window.addEventListener('load', initAll);
+window.addEventListener('resize', initAll);
+
+let selectedSlot = null;
+
+function openCalendar() {
+  document.getElementById('openCalBtn').style.display = 'none';
+  const slots = document.getElementById('calendarSlots');
+  slots.style.display = 'block';
+  slots.style.opacity = '0';
+  slots.style.transform = 'translateY(12px)';
+  slots.style.transition = 'all 0.35s ease';
+  requestAnimationFrame(() => {
+    slots.style.opacity = '1';
+    slots.style.transform = 'translateY(0)';
+  });
+}
+
+function selectSlot(el, day, time) {
+  document.querySelectorAll('.slot-card').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedSlot = { day, time };
+  const area = document.getElementById('confirmArea');
+  area.classList.add('show');
+  document.getElementById('confirmTitle').textContent = '✅ Hai scelto: ' + day + ' ore ' + time;
+  area.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function confirmBooking() {
+  const name = document.getElementById('fname').value.trim();
+  const phone = document.getElementById('fphone').value.trim();
+  const email = document.getElementById('femail').value.trim();
+  if (!name || !phone) { alert('Inserisci nome e numero di telefono per confermare.'); return; }
+  if (!selectedSlot) return;
+
+  const subject = encodeURIComponent('PRENOTAZIONE E&V — ' + selectedSlot.day + ' ' + selectedSlot.time);
+  const body = encodeURIComponent(
+    'Nuova prenotazione!\n\n' +
+    'Giorno: ' + selectedSlot.day + '\n' +
+    'Orario: ' + selectedSlot.time + '\n' +
+    'Nome: ' + name + '\n' +
+    'Telefono: ' + phone + '\n' +
+    (email ? 'Email: ' + email + '\n' : '')
+  );
+  window.location.href = 'mailto:elfuerte2014.jqs@gmail.com?subject=' + subject + '&body=' + body;
+
+  const area = document.getElementById('confirmArea');
+  area.innerHTML = '<div style="text-align:center;padding:16px 0;">' +
+    '<div style="font-size:48px;margin-bottom:12px;">✅</div>' +
+    '<h3 style="font-size:18px;color:#059669;margin-bottom:6px;">Prenotazione confermata!</h3>' +
+    '<p style="color:#64748b;font-size:14px;">' + selectedSlot.day + ' — ore ' + selectedSlot.time + '<br>Ti contatteremo al numero <strong>' + phone + '</strong></p>' +
+    '</div>';
+}
+</script>
+</body>
+</html>
