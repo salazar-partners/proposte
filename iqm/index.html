@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Proposta Automatizzazioni n8n — IQM Selezione</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; background: #f8fafc; color: #0f172a; }
+
+  /* HERO */
+  .hero { background: linear-gradient(135deg, #0f172a, #1a2744); padding: 52px 48px; }
+  .hero-tag { display: inline-block; background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.2); color: #cbd5e1; font-size: 11px; font-weight: 700; padding: 4px 14px; border-radius: 20px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 18px; }
+  .hero h1 { font-size: 36px; font-weight: 800; color: #fff; line-height: 1.15; max-width: 620px; }
+  .hero h1 span { color: #f59e0b; }
+  .hero p { color: #94a3b8; font-size: 16px; margin-top: 12px; max-width: 540px; line-height: 1.6; }
+  .hero-chips { display: flex; gap: 12px; margin-top: 28px; flex-wrap: wrap; }
+  .hchip { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.18); color: #e2e8f0; padding: 8px 16px; border-radius: 8px; font-size: 13px; }
+  .hchip strong { color: #f59e0b; }
+
+  /* SECTION */
+  .wrap { max-width: 860px; margin: 0 auto; padding: 0 40px; }
+  .sec-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: #2563eb; margin-bottom: 8px; }
+  .sec-title { font-size: 24px; font-weight: 800; color: #0f172a; margin-bottom: 24px; }
+  .sec-title span { color: #1d4ed8; }
+
+  /* PROBLEM CARDS */
+  .problems { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; margin-bottom: 52px; }
+  .prob { background: #fff; border: 1px solid #e2e8f0; border-radius: 14px; padding: 22px; }
+  .prob .ico { font-size: 28px; margin-bottom: 10px; }
+  .prob h3 { font-size: 14px; font-weight: 700; margin-bottom: 6px; }
+  .prob p { font-size: 13px; color: #64748b; line-height: 1.5; }
+  .prob .cost { font-size: 12px; color: #ef4444; font-weight: 600; margin-top: 10px; }
+
+  /* N8N CANVAS */
+  .workflow-section { margin-bottom: 40px; }
+  .wf-label { display: flex; align-items: center; gap: 14px; margin-bottom: 16px; }
+  .wf-badge { width: 32px; height: 32px; border-radius: 50%; color: #fff; font-weight: 800; font-size: 14px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .wf-title { font-size: 16px; font-weight: 700; color: #0f172a; }
+  .wf-price { font-size: 13px; color: #64748b; }
+
+  .canvas-wrap { background: #1a1a2e; border-radius: 16px; overflow: hidden; border: 1px solid #2d2d4e; }
+  .canvas-topbar { background: #13132a; padding: 10px 18px; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid #2d2d4e; }
+  .dot-r { width: 10px; height: 10px; border-radius: 50%; background: #ff5f57; }
+  .dot-y { width: 10px; height: 10px; border-radius: 50%; background: #febc2e; }
+  .dot-g { width: 10px; height: 10px; border-radius: 50%; background: #28c840; }
+  .canvas-name { font-size: 12px; color: #6b7280; margin-left: 8px; }
+
+  .canvas { position: relative; width: 100%; overflow-x: auto; }
+  .canvas-inner { position: relative; min-width: 820px; height: 220px; }
+  .canvas-inner { background-image: radial-gradient(circle, #2d2d4e 1px, transparent 1px); background-size: 24px 24px; }
+
+  .n8n-node { position: absolute; width: 160px; background: #1e1e3f; border: 1px solid #3d3d6b; border-radius: 10px; overflow: hidden; cursor: default; box-shadow: 0 4px 20px rgba(0,0,0,0.4); }
+  .n8n-node:hover { border-color: #6366f1; box-shadow: 0 4px 20px rgba(99,102,241,0.3); }
+  .node-top { height: 5px; }
+  .node-body { padding: 10px 12px; display: flex; align-items: center; gap: 10px; }
+  .node-icon-wrap { width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+  .node-text { flex: 1; min-width: 0; }
+  .node-name { font-size: 11px; font-weight: 700; color: #e2e8f0; line-height: 1.3; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .node-sub { font-size: 10px; color: #6b7280; margin-top: 2px; }
+
+  .port-in { position: absolute; left: -5px; top: 50%; transform: translateY(-50%); width: 10px; height: 10px; border-radius: 50%; background: #3d3d6b; border: 2px solid #6366f1; }
+  .port-out { position: absolute; right: -5px; top: 50%; transform: translateY(-50%); width: 10px; height: 10px; border-radius: 50%; background: #3d3d6b; border: 2px solid #6366f1; }
+
+  .connections { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; }
+
+  .results-strip { background: #13132a; padding: 12px 20px; display: flex; gap: 16px; flex-wrap: wrap; }
+  .res-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: #94a3b8; }
+  .res-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+
+  /* EMAIL PREVIEW */
+  .email-preview-wrap { background: #f1f5f9; border-radius: 16px; padding: 24px; margin-bottom: 40px; }
+  .ep-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #64748b; margin-bottom: 14px; }
+  .email-card { background: #fff; border-radius: 12px; padding: 28px; border: 1px solid #e2e8f0; font-family: Arial, sans-serif; }
+  .email-card h2 { color: #0f172a; font-size: 18px; }
+  .email-card .edate { color: #94a3b8; font-size: 12px; margin-top: 4px; }
+  .estats { display: flex; gap: 10px; margin: 18px 0; flex-wrap: wrap; }
+  .estat { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 12px 16px; text-align: center; flex: 1; min-width: 80px; }
+  .estat .en { font-size: 22px; font-weight: 800; color: #1d4ed8; }
+  .estat .el { font-size: 11px; color: #94a3b8; }
+  .etable { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .etable th { background: #0f172a; color: #fff; padding: 8px 12px; text-align: left; font-size: 12px; }
+  .etable td { padding: 8px 12px; border-bottom: 1px solid #f1f5f9; }
+  .ebadge { display: inline-block; padding: 2px 8px; border-radius: 9999px; font-size: 11px; font-weight: 600; }
+  .ebg { background: #dcfce7; color: #166534; }
+  .ebb { background: #fef3c7; color: #92400e; }
+  .ebc { background: #dbeafe; color: #1e40af; }
+  .ebr { background: #fee2e2; color: #991b1b; }
+
+  /* ROI */
+  .roi-bar { background: #0f172a; border-radius: 16px; padding: 32px; margin-bottom: 40px; }
+  .roi-bar h3 { color: #fff; font-size: 18px; font-weight: 700; margin-bottom: 20px; }
+  .roi-items { display: grid; grid-template-columns: repeat(4,1fr); gap: 14px; }
+  .roi-i { background: rgba(255,255,255,0.08); border-radius: 12px; padding: 18px; text-align: center; }
+  .roi-i .rn { font-size: 26px; font-weight: 900; color: #f59e0b; }
+  .roi-i .rl { font-size: 11px; color: #94a3b8; margin-top: 4px; line-height: 1.4; }
+
+  /* PRICING */
+  .pricing-box { background: #fff; border: 2px solid #e2e8f0; border-radius: 16px; padding: 32px; margin-bottom: 40px; }
+  .pricing-row { display: flex; justify-content: space-between; align-items: center; padding: 14px 0; border-bottom: 1px solid #f1f5f9; }
+  .pricing-row:last-child { border-bottom: none; }
+  .pricing-label { font-size: 14px; font-weight: 600; color: #0f172a; }
+  .pricing-sub { font-size: 12px; color: #64748b; margin-top: 2px; }
+  .pricing-amount { font-size: 18px; font-weight: 800; color: #0f172a; }
+  .pricing-amount.highlight { color: #1d4ed8; }
+  .pricing-amount.retain { color: #16a34a; font-size: 15px; }
+  .pricing-divider { border: none; border-top: 2px dashed #e2e8f0; margin: 8px 0; }
+
+  /* CALENDAR */
+  .cal-box { background: #fff; border: 2px solid #0f172a; border-radius: 20px; padding: 36px; margin-bottom: 52px; }
+  .cal-box h2 { font-size: 22px; font-weight: 800; text-align: center; }
+  .cal-box .sub { color: #64748b; font-size: 14px; text-align: center; margin-top: 6px; margin-bottom: 28px; }
+  .slots-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 24px; max-width: 600px; margin-left: auto; margin-right: auto; }
+  .slot-card { border: 2px solid #e2e8f0; border-radius: 14px; padding: 14px 10px; text-align: center; cursor: pointer; transition: all 0.18s; }
+  .slot-card:hover { border-color: #0f172a; background: #f8fafc; transform: translateY(-2px); }
+  .slot-card.selected { border-color: #0f172a; background: #0f172a; color: #fff; transform: translateY(-2px); box-shadow: 0 4px 16px rgba(15,23,42,0.3); }
+  .slot-card .day-name { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.7px; color: #64748b; }
+  .slot-card.selected .day-name { color: #94a3b8; }
+  .slot-card .day-num { font-size: 28px; font-weight: 900; color: #0f172a; margin: 4px 0; }
+  .slot-card.selected .day-num { color: #fff; }
+  .slot-card .month { font-size: 11px; color: #94a3b8; }
+  .slot-card.selected .month { color: #64748b; }
+  .slot-card .time { font-size: 13px; font-weight: 700; color: #1d4ed8; margin-top: 8px; background: #dbeafe; border-radius: 6px; padding: 4px 6px; }
+  .slot-card.selected .time { color: #f59e0b; background: rgba(245,158,11,0.15); }
+  .slot-card .dur { font-size: 10px; color: #94a3b8; margin-top: 3px; }
+  .slot-card.selected .dur { color: #64748b; }
+
+  .confirm-area { display: none; background: #f8fafc; border-radius: 14px; padding: 24px; margin-top: 4px; }
+  .confirm-area.show { display: block; }
+  .confirm-area h3 { font-size: 15px; font-weight: 700; margin-bottom: 16px; }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+  .form-input { width: 100%; padding: 10px 14px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 14px; outline: none; font-family: inherit; }
+  .form-input:focus { border-color: #0f172a; box-shadow: 0 0 0 3px rgba(15,23,42,0.1); }
+  .confirm-btn { width: 100%; background: #0f172a; color: #fff; border: none; padding: 13px; border-radius: 10px; font-weight: 700; font-size: 15px; cursor: pointer; margin-top: 4px; }
+  .confirm-btn:hover { background: #1e293b; }
+  .cta-note { font-size: 12px; color: #94a3b8; text-align: center; margin-top: 14px; }
+
+  .spacer { height: 48px; }
+  .spacer-sm { height: 24px; }
+  @media(max-width:640px){ .problems,.roi-items,.slots-grid{ grid-template-columns:1fr 1fr; } .wrap{ padding:0 20px; } .hero{ padding:36px 24px; } }
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="wrap">
+    <div style="font-size:11px;font-weight:700;letter-spacing:4px;text-transform:uppercase;color:#f59e0b;margin-bottom:8px;">SALAZAR PARTNERS</div>
+    <div class="hero-tag">Proposta personalizzata · IQM Selezione · Milano</div>
+    <h1>Stesso team, <span>30–50% posizioni<br>in più</span> — senza assumere</h1>
+    <p>4 workflow attivi in 12 giorni che eliminano lo screening manuale, automatizzano le comunicazioni candidati e generano i report clienti ogni venerdì.</p>
+    <div class="hero-chips">
+      <div class="hchip">💰 <strong>€30.000</strong> · 3 tranche da €10.000</div>
+      <div class="hchip">📅 <strong>4 workflow</strong> · 10–12 giorni</div>
+      <div class="hchip">⚡ Fase 1 attiva in <strong>5–6 giorni</strong></div>
+      <div class="hchip">🔁 Manutenzione <strong>€1.500/mese</strong> dal mese 2</div>
+    </div>
+  </div>
+</div>
+
+<div class="spacer"></div>
+
+<!-- PROBLEMS -->
+<div class="wrap">
+  <div class="sec-label">Il problema oggi</div>
+  <div class="sec-title">Ore perse ogni giorno in processi <span>che si automatizzano</span></div>
+  <div class="problems">
+    <div class="prob">
+      <div class="ico">📄</div>
+      <h3>Screening CV manuale</h3>
+      <p>Ogni posizione genera decine di CV. I recruiter li leggono uno a uno, lenti e con criteri inconsistenti. Il collo di bottiglia è qui.</p>
+      <div class="cost">2–3 ore/giorno per recruiter sprecate</div>
+    </div>
+    <div class="prob">
+      <div class="ico">✉️</div>
+      <h3>Comunicazioni candidati a mano</h3>
+      <p>Convocazioni, feedback, aggiornamenti. Ogni email o messaggio scritto manualmente. Ritardi che fanno perdere i candidati migliori.</p>
+      <div class="cost">Candidati top persi per lentezza</div>
+    </div>
+    <div class="prob">
+      <div class="ico">📊</div>
+      <h3>Report clienti manuali</h3>
+      <p>Il cliente vuole sapere dove siete. Preparare la pipeline a mano ogni settimana sottrae tempo alla ricerca e crea insoddisfazione.</p>
+      <div class="cost">~2 ore/settimana per posizione sprecate</div>
+    </div>
+  </div>
+</div>
+
+<!-- WORKFLOWS -->
+<div class="wrap">
+  <div class="sec-label">La soluzione</div>
+  <div class="sec-title">4 workflow <span>già pronti</span> — ecco come funzionano</div>
+
+  <!-- WF 1 -->
+  <div class="workflow-section">
+    <div class="wf-label">
+      <div class="wf-badge" style="background:#7c3aed;">1</div>
+      <div>
+        <div class="wf-title">CV Screening AI — Shortlist Automatica</div>
+        <div class="wf-price">Fase 1 · incluso · 3–4 giorni lavorativi</div>
+      </div>
+    </div>
+    <div class="canvas-wrap">
+      <div class="canvas-topbar"><div class="dot-r"></div><div class="dot-y"></div><div class="dot-g"></div><span class="canvas-name">WF 1 — CV Screening AI | IQM Selezione Milano</span></div>
+      <div class="canvas">
+        <div class="canvas-inner" id="c1">
+          <svg class="connections" id="svg1"></svg>
+
+          <div class="n8n-node" id="n1_1" style="left:20px;top:82px;">
+            <div class="node-top" style="background:#7c3aed;"></div>
+            <div class="node-body">
+              <div class="node-icon-wrap" style="background:#4c1d9522;">📥</div>
+              <div class="node-text"><div class="node-name">Ricevi CV</div><div class="node-sub">Email / Form candidatura</div></div>
+            </div>
+            <div class="port-out"></div>
+          </div>
+
+          <div class="n8n-node" id="n1_2" style="left:210px;top:82px;">
+            <div class="node-top" style="background:#d97706;"></div>
+            <div class="node-body">
+              <div class="node-icon-wrap" style="background:#78350f22;">🧠</div>
+              <div class="node-text"><div class="node-name">AI Score CV</div><div class="node-sub">Claude · fit vs job desc</div></div>
+            </div>
+            <div class="port-in"></div><div class="port-out"></div>
+          </div>
+
+          <div class="n8n-node" id="n1_3" style="left:400px;top:82px;">
+            <div class="node-top" style="background:#2563eb;"></div>
+            <div class="node-body">
+              <div class="node-icon-wrap" style="background:#1e3a8a22;">🔀</div>
+              <div class="node-text"><div class="node-name">Filtra per Score</div><div class="node-sub">Switch · Alta/Media/Bassa</div></div>
+            </div>
+            <div class="port-in"></div><div class="port-out"></div>
+          </div>
+
+          <div class="n8n-node" id="n1_4" style="left:590px;top:40px;">
+            <div class="node-top" style="background:#16a34a;"></div>
+            <div class="node-body">
+              <div class="node-icon-wrap" style="background:#14532d22;">📲</div>
+              <div class="node-text"><div class="node-name">Notifica Recruiter</div><div class="node-sub">ALTA — shortlist immediata</div></div>
+            </div>
+            <div class="port-in"></div><div class="port-out"></div>
+          </div>
+
+          <div class="n8n-node" id="n1_5" style="left:590px;top:130px;">
+            <div class="node-top" style="background:#64748b;"></div>
+            <div class="node-body">
+              <div class="node-icon-wrap" style="background:#1e293b22;">🗂️</div>
+              <div class="node-text"><div class="node-name">Archivia Media/Bassa</div><div class="node-sub">Google Sheets · pool</div></div>
+            </div>
+            <div class="port-in"></div><div class="port-out"></div>
+          </div>
+
+          <div class="n8n-node" id="n1_6" style="left:780px;top:82px;">
+            <div class="node-top" style="background:#059669;"></div>
+            <div class="node-body">
+              <div class="node-icon-wrap" style="background:#064e3b22;">📋</div>
+              <div class="node-text"><div class="node-name">Aggiorna DB</div><div class="node-sub">31.000 candidati · IQM</div></div>
+            </div>
+            <div class="port-in"></div>
+          </div>
+
+        </div>
+      </div>
+      <div class="results-strip">
+        <div class="res-item"><div class="res-dot" style="background:#7c3aed;"></div>CV letto e scored in &lt;15 secondi</div>
+        <div class="res-item"><div class="res-dot" style="background:#16a34a;"></div>Recruiter riceve solo i migliori</div>
+        <div class="res-item"><div class="res-dot" style="background:#059669;"></div>Database sempre aggiornato</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- WF 2 -->
+  <div class="workflow-section">
+    <div class="wf-label">
+      <div class="wf-badge" style="background:#0891b2;">2</div>
+      <div>
+        <div class="wf-title">Comunicazioni Candidati Automatiche</div>
+        <div class="wf-price">Fase 1 · incluso · 3–4 giorni lavorativi</div>
+      </div>
+    </div>
+    <div class="canvas-wrap">
+      <div class="canvas-topbar"><div class="dot-r"></div><div class="dot-y"></div><div class="dot-g"></div><span class="canvas-name">WF 2 — Comunicazioni Candidati | IQM Selezione Milano</span></div>
+      <div class="canvas">
+        <div class="canvas-inner" id="c2">
+          <svg class="connections" id="svg2"></svg>
+
+          <div class="n8n-node" id="n2_1" style="left:20px;top:82px;">
+            <div class="node-top" style="background:#0891b2;"></div>
+            <div class="node-body">
+              <div class="node-icon-wrap" style="background:#0c4a6e22;">🔄</div>
+              <div class="node-text"><div class="node-name">Cambio Status</div><div class="node-sub">Webhook · CRM / Sheets</div></div>
+            </div>
+            <div class="port-out"></div>
+          </div>
+
+          <div class="n8n-node" id="n2_2" style="left:210px;top:82px;">
+            <div class="node-top" style="background:#7c3aed;"></div>
+            <div class="node-body">
+              <div class="node-icon-wrap" style="background:#4c1d9522;">🔀</div>
+              <div class="node-text"><div class="node-name">Tipo Evento</div><div class="node-sub">Switch · convoca/feedback/ok</div></div>
+            </div>
+            <div class="port-in"></div><div class="port-out"></div>
+          </div>
+
+          <div class="n8n-node" id="n2_3" style="left:400px;top:30px;">
+            <div class="node-top" style="background:#16a34a;"></div>
+            <div class="node-body">
+              <div class="node-icon-wrap" style="background:#14532d22;">📅</div>
+              <div class="node-text"><div class="node-name">Convocazione</div><div class="node-sub">Email + WhatsApp candidato</div></div>
+            </div>
+            <div class="port-in"></div><div class="port-out"></div>
+          </div>
+
+          <div class="n8n-node" id="n2_4" style="left:400px;top:110px;">
+            <div class="node-top" style="background:#64748b;"></div>
+            <div class="node-body">
+              <div class="node-icon-wrap" style="background:#1e293b22;">👋</div>
+              <div class="node-text"><div class="node-name">Feedback Negativo</div><div class="node-sub">Email cortese automatica</div></div>
+            </div>
+            <div class="port-in"></div><div class="port-out"></div>
+          </div>
+
+          <div class="n8n-node" id="n2_5" style="left:400px;top:160px;">
+            <div class="node-top" style="background:#d97706;"></div>
+            <div class="node-body">
+              <div class="node-icon-wrap" style="background:#78350f22;">🎉</div>
+              <div class="node-text"><div class="node-name">Inserimento OK</div><div class="node-sub">Email congratulazioni + docs</div></div>
+            </div>
+            <div class="port-in"></div><div class="port-out"></div>
+          </div>
+
+          <div class="n8n-node" id="n2_6" style="left:620px;top:82px;">
+            <div class="node-top" style="background:#059669;"></div>
+            <div class="node-body">
+              <div class="node-icon-wrap" style="background:#064e3b22;">✅</div>
+              <div class="node-text"><div class="node-name">Log Comunicazione</div><div class="node-sub">Google Sheets · storico</div></div>
+            </div>
+            <div class="port-in"></div>
+          </div>
+
+        </div>
+      </div>
+      <div class="results-strip">
+        <div class="res-item"><div class="res-dot" style="background:#0891b2;"></div>Zero email manuali ai candidati</div>
+        <div class="res-item"><div class="res-dot" style="background:#16a34a;"></div>Risposta istantanea = candidati felici</div>
+        <div class="res-item"><div class="res-dot" style="background:#059669;"></div>Storico completo automatico</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- WF 3 -->
+  <div class="workflow-section">
+    <div class="wf-label">
+      <div class="wf-badge" style="background:#d97706;">3</div>
+      <div>
+        <div class="wf-title">Report Cliente Settimanale — Ogni Venerdì</div>
+        <div class="wf-price">Fase 2 · incluso · 2–3 giorni lavorativi</div>
+      </div>
+    </div>
+    <div class="canvas-wrap">
+      <div class="canvas-topbar"><div class="dot-r"></div><div class="dot-y"></div><div class="dot-g"></div><span class="canvas-name">WF 3 — Report Cliente Settimanale | IQM Selezione Milano</span></div>
+      <div class="canvas">
+        <div class="canvas-inner" id="c3">
+          <svg class="connections" id="svg3"></svg>
+
+          <div class="n8n-node" id="n3_1" style="left:20px;top:82px;">
+            <div class="node-top" style="background:#d97706;"></div>
+            <div class="node-body">
+              <div class="node-icon-wrap" style="background:#78350f22;">⏰</div>
+              <div class="node-text"><div class="node-name">Ogni venerdì 17:00</div><div class="node-sub">Schedule Trigger</div></div>
+            </div>
+            <div class="port-out"></div>
+          </div>
+
+          <div class="n8n-node" id="n3_2" style="left:210px;top:82px;">
+            <div class="node-top" style="background:#059669;"></div>
+            <div class="node-body">
+              <div class="node-icon-wrap" style="background:#064e3b22;">📋</div>
+              <div class="node-text"><div class="node-name">Leggi Pipeline</div><div class="node-sub">Google Sheets · posizioni</div></div>
+            </div>
+            <div class="port-in"></div><div class="port-out"></div>
+          </div>
+
+          <div class="n8n-node" id="n3_3" style="left:400px;top:82px;">
+            <div class="node-top" style="background:#7c3aed;"></div>
+            <div class="node-body">
+              <div class="node-icon-wrap" style="background:#4c1d9522;">🧠</div>
+              <div class="node-text"><div class="node-name">Genera Report</div><div class="node-sub">Code · sintesi settimanale</div></div>
+            </div>
+            <div class="port-in"></div><div class="port-out"></div>
+          </div>
+
+          <div class="n8n-node" id="n3_4" style="left:590px;top:82px;">
+            <div class="node-top" style="background:#0891b2;"></div>
+            <div class="node-body">
+              <div class="node-icon-wrap" style="background:#0c4a6e22;">📧</div>
+              <div class="node-text"><div class="node-name">Email al Cliente</div><div class="node-sub">Gmail · report pipeline</div></div>
+            </div>
+            <div class="port-in"></div><div class="port-out"></div>
+          </div>
+
+          <div class="n8n-node" id="n3_5" style="left:780px;top:82px;">
+            <div class="node-top" style="background:#16a34a;"></div>
+            <div class="node-body">
+              <div class="node-icon-wrap" style="background:#14532d22;">✅</div>
+              <div class="node-text"><div class="node-name">Log Inviato</div><div class="node-sub">Sheets · data + cliente</div></div>
+            </div>
+            <div class="port-in"></div>
+          </div>
+
+        </div>
+      </div>
+      <div class="results-strip">
+        <div class="res-item"><div class="res-dot" style="background:#d97706;"></div>Zero report manuali ogni settimana</div>
+        <div class="res-item"><div class="res-dot" style="background:#0891b2;"></div>Cliente informato = più fiducia</div>
+        <div class="res-item"><div class="res-dot" style="background:#16a34a;"></div>Meno telefonate di aggiornamento</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- WF 4 -->
+  <div class="workflow-section">
+    <div class="wf-label">
+      <div class="wf-badge" style="background:#16a34a;">4</div>
+      <div>
+        <div class="wf-title">Lead Nurturing Clienti — Re-engagement Automatico</div>
+        <div class="wf-price">Fase 2 · incluso · 2–3 giorni lavorativi</div>
+      </div>
+    </div>
+    <div class="canvas-wrap">
+      <div class="canvas-topbar"><div class="dot-r"></div><div class="dot-y"></div><div class="dot-g"></div><span class="canvas-name">WF 4 — Lead Nurturing Clienti | IQM Selezione Milano</span></div>
+      <div class="canvas">
+        <div class="canvas-inner" id="c4">
+          <svg class="connections" id="svg4"></svg>
+
+          <div class="n8n-node" id="n4_1" style="left:20px;top:82px;">
+            <div class="node-top" style="background:#d97706;"></div>
+            <div class="node-body">
+              <div class="node-icon-wrap" style="background:#78350f22;">⏰</div>
+              <div class="node-text"><div class="node-name">Ogni lunedì 9:00</div><div class="node-sub">Schedule Trigger</div></div>
+            </div>
+            <div class="port-out"></div>
+          </div>
+
+          <div class="n8n-node" id="n4_2" style="left:210px;top:82px;">
+            <div class="node-top" style="background:#059669;"></div>
+            <div class="node-body">
+              <div class="node-icon-wrap" style="background:#064e3b22;">📋</div>
+              <div class="node-text"><div class="node-name">Controlla Clienti</div><div class="node-sub">Google Sheets · ultima pos.</div></div>
+            </div>
+            <div class="port-in"></div><div class="port-out"></div>
+          </div>
+
+          <div class="n8n-node" id="n4_3" style="left:400px;top:82px;">
+            <div class="node-top" style="background:#2563eb;"></div>
+            <div class="node-body">
+              <div class="node-icon-wrap" style="background:#1e3a8a22;">🔍</div>
+              <div class="node-text"><div class="node-name">Inattivo &gt; 60 giorni?</div><div class="node-sub">If · data ultimo mandato</div></div>
+            </div>
+            <div class="port-in"></div><div class="port-out"></div>
+          </div>
+
+          <div class="n8n-node" id="n4_4" style="left:590px;top:40px;">
+            <div class="node-top" style="background:#16a34a;"></div>
+            <div class="node-body">
+              <div class="node-icon-wrap" style="background:#14532d22;">📧</div>
+              <div class="node-text"><div class="node-name">Email Re-engagement</div><div class="node-sub">Personalizzata per cliente</div></div>
+            </div>
+            <div class="port-in"></div><div class="port-out"></div>
+          </div>
+
+          <div class="n8n-node" id="n4_5" style="left:590px;top:130px;">
+            <div class="node-top" style="background:#64748b;"></div>
+            <div class="node-body">
+              <div class="node-icon-wrap" style="background:#1e293b22;">✅</div>
+              <div class="node-text"><div class="node-name">Attivo — skip</div><div class="node-sub">Nessuna azione</div></div>
+            </div>
+            <div class="port-in"></div>
+          </div>
+
+          <div class="n8n-node" id="n4_6" style="left:780px;top:40px;">
+            <div class="node-top" style="background:#059669;"></div>
+            <div class="node-body">
+              <div class="node-icon-wrap" style="background:#064e3b22;">📋</div>
+              <div class="node-text"><div class="node-name">Log Contatto</div><div class="node-sub">Sheets · data + esito</div></div>
+            </div>
+            <div class="port-in"></div>
+          </div>
+
+        </div>
+      </div>
+      <div class="results-strip">
+        <div class="res-item"><div class="res-dot" style="background:#16a34a;"></div>Clienti dormienti riattivati in automatico</div>
+        <div class="res-item"><div class="res-dot" style="background:#2563eb;"></div>Zero revenue persa per dimenticanza</div>
+        <div class="res-item"><div class="res-dot" style="background:#059669;"></div>Storico contatti sempre aggiornato</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="spacer"></div>
+
+<!-- EMAIL PREVIEW -->
+<div class="wrap">
+  <div class="sec-label">Esempio output reale</div>
+  <div class="sec-title">Report che il <span>cliente riceve ogni venerdì</span></div>
+  <div class="email-preview-wrap">
+    <div class="ep-label">📧 Anteprima email automatica — Venerdì 15 maggio 2026 · 17:00</div>
+    <div class="email-card">
+      <h2>Report Settimanale — Posizioni Aperte</h2>
+      <div class="edate">Da: IQM Selezione &lt;info@iqmselezione.it&gt; · Venerdì 15 maggio 2026</div>
+      <div class="estats">
+        <div class="estat"><div class="en">12</div><div class="el">CV ricevuti</div></div>
+        <div class="estat"><div class="en">4</div><div class="el">In shortlist</div></div>
+        <div class="estat"><div class="en">2</div><div class="el">Colloqui fissati</div></div>
+        <div class="estat"><div class="en">1</div><div class="el">Offerta inviata</div></div>
+      </div>
+      <table class="etable">
+        <thead><tr><th>Candidato</th><th>Posizione</th><th>Score AI</th><th>Stato</th></tr></thead>
+        <tbody>
+          <tr><td>M. Rossi</td><td>CFO Executive</td><td>94/100</td><td><span class="ebadge ebg">Colloquio mercoledì</span></td></tr>
+          <tr><td>L. Ferretti</td><td>CFO Executive</td><td>88/100</td><td><span class="ebadge ebc">Shortlist</span></td></tr>
+          <tr><td>A. Conti</td><td>HR Manager</td><td>91/100</td><td><span class="ebadge ebb">Offerta inviata</span></td></tr>
+          <tr><td>G. Martini</td><td>HR Manager</td><td>79/100</td><td><span class="ebadge ebc">Shortlist</span></td></tr>
+        </tbody>
+      </table>
+      <p style="font-size:12px;color:#94a3b8;margin-top:14px;">Report generato automaticamente da IQM Selezione · Prossimo aggiornamento: venerdì 22 maggio</p>
+    </div>
+  </div>
+</div>
+
+<div class="spacer"></div>
+
+<!-- ROI -->
+<div class="wrap">
+  <div class="roi-bar">
+    <h3>Il ritorno sull'investimento per IQM</h3>
+    <div class="roi-items">
+      <div class="roi-i"><div class="rn">+50%</div><div class="rl">posizioni gestite<br>stesso team</div></div>
+      <div class="roi-i"><div class="rn">2–3h</div><div class="rl">risparmiate<br>per recruiter/giorno</div></div>
+      <div class="roi-i"><div class="rn">4–6 sett.</div><div class="rl">per recuperare<br>l'investimento</div></div>
+      <div class="roi-i"><div class="rn">€1.500</div><div class="rl">manutenzione<br>mensile inclusa</div></div>
+    </div>
+  </div>
+</div>
+
+<div class="spacer"></div>
+
+<!-- PRICING -->
+<div class="wrap">
+  <div class="sec-label">Investimento</div>
+  <div class="sec-title">Struttura di <span>pagamento scaglionato</span></div>
+  <div class="pricing-box">
+    <div class="pricing-row">
+      <div>
+        <div class="pricing-label">Tranche 1 — Alla firma</div>
+        <div class="pricing-sub">Inizio lavori immediato · Setup ambiente n8n</div>
+      </div>
+      <div class="pricing-amount highlight">€10.000</div>
+    </div>
+    <div class="pricing-row">
+      <div>
+        <div class="pricing-label">Tranche 2 — Consegna Fase 1</div>
+        <div class="pricing-sub">WF1 CV Screening + WF2 Comunicazioni candidati · giorni 5–6</div>
+      </div>
+      <div class="pricing-amount highlight">€10.000</div>
+    </div>
+    <div class="pricing-row">
+      <div>
+        <div class="pricing-label">Tranche 3 — Consegna Fase 2</div>
+        <div class="pricing-sub">WF3 Report cliente + WF4 Lead nurturing · giorni 10–12</div>
+      </div>
+      <div class="pricing-amount highlight">€10.000</div>
+    </div>
+    <hr class="pricing-divider">
+    <div class="pricing-row">
+      <div>
+        <div class="pricing-label">Totale setup</div>
+        <div class="pricing-sub">4 workflow attivi in 10–12 giorni lavorativi</div>
+      </div>
+      <div class="pricing-amount" style="font-size:22px;">€30.000</div>
+    </div>
+    <div class="pricing-row">
+      <div>
+        <div class="pricing-label">Manutenzione mensile — dal mese 2</div>
+        <div class="pricing-sub">Fix tecnici · aggiornamenti · monitoring · report mensile · supporto WhatsApp lun–ven</div>
+      </div>
+      <div class="pricing-amount retain">€1.500/mese</div>
+    </div>
+  </div>
+  <p style="font-size:13px;color:#64748b;text-align:center;margin-top:-20px;margin-bottom:40px;">Stop senza penali dopo ogni tranche · Pagamento solo al risultato</p>
+</div>
+
+<!-- MANUTENZIONE -->
+<div class="wrap">
+  <div class="sec-label">Piano di manutenzione</div>
+  <div class="sec-title">Cosa è <span>incluso</span> ogni mese</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:52px;">
+    <div style="background:#fff;border:1px solid #e2e8f0;border-radius:16px;padding:28px;">
+      <div style="font-size:13px;font-weight:700;color:#16a34a;text-transform:uppercase;letter-spacing:1px;margin-bottom:16px;">✓ Incluso a €1.500/mese</div>
+      <div style="display:flex;flex-direction:column;gap:12px;">
+        <div style="display:flex;gap:10px;align-items:flex-start;"><span style="color:#16a34a;font-weight:700;flex-shrink:0;">✓</span><div><div style="font-size:13px;font-weight:600;">Fix tecnici entro 24h</div><div style="font-size:12px;color:#64748b;margin-top:2px;">Se un workflow si rompe, interveniamo entro il giorno lavorativo successivo</div></div></div>
+        <div style="display:flex;gap:10px;align-items:flex-start;"><span style="color:#16a34a;font-weight:700;flex-shrink:0;">✓</span><div><div style="font-size:13px;font-weight:600;">Aggiornamento credenziali e API</div><div style="font-size:12px;color:#64748b;margin-top:2px;">Quando Gmail, WhatsApp o altre piattaforme aggiornano le credenziali</div></div></div>
+        <div style="display:flex;gap:10px;align-items:flex-start;"><span style="color:#16a34a;font-weight:700;flex-shrink:0;">✓</span><div><div style="font-size:13px;font-weight:600;">Modifiche minori ai workflow</div><div style="font-size:12px;color:#64748b;margin-top:2px;">Un campo, una condizione, un destinatario email — piccoli aggiustamenti inclusi</div></div></div>
+        <div style="display:flex;gap:10px;align-items:flex-start;"><span style="color:#16a34a;font-weight:700;flex-shrink:0;">✓</span><div><div style="font-size:13px;font-weight:600;">Monitoring settimanale</div><div style="font-size:12px;color:#64748b;margin-top:2px;">Verifica automatica che tutti i workflow girino correttamente ogni settimana</div></div></div>
+        <div style="display:flex;gap:10px;align-items:flex-start;"><span style="color:#16a34a;font-weight:700;flex-shrink:0;">✓</span><div><div style="font-size:13px;font-weight:600;">Report mensile</div><div style="font-size:12px;color:#64748b;margin-top:2px;">Automazioni eseguite, errori rilevati, ore risparmiate — tutto documentato</div></div></div>
+        <div style="display:flex;gap:10px;align-items:flex-start;"><span style="color:#16a34a;font-weight:700;flex-shrink:0;">✓</span><div><div style="font-size:13px;font-weight:600;">Supporto WhatsApp lun–ven</div><div style="font-size:12px;color:#64748b;margin-top:2px;">Risposta in giornata per domande tecniche o richieste di modifica</div></div></div>
+      </div>
+    </div>
+    <div style="background:#fafafa;border:1px solid #e2e8f0;border-radius:16px;padding:28px;">
+      <div style="font-size:13px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:1px;margin-bottom:16px;">✗ Non incluso — quota a parte</div>
+      <div style="display:flex;flex-direction:column;gap:12px;">
+        <div style="display:flex;gap:10px;align-items:flex-start;"><span style="color:#94a3b8;font-weight:700;flex-shrink:0;">✗</span><div><div style="font-size:13px;font-weight:600;color:#64748b;">Nuovi workflow aggiuntivi</div><div style="font-size:12px;color:#94a3b8;margin-top:2px;">Ogni automazione nuova viene quotata separatamente</div></div></div>
+        <div style="display:flex;gap:10px;align-items:flex-start;"><span style="color:#94a3b8;font-weight:700;flex-shrink:0;">✗</span><div><div style="font-size:13px;font-weight:600;color:#64748b;">Nuove integrazioni di piattaforma</div><div style="font-size:12px;color:#94a3b8;margin-top:2px;">Connettere strumenti non previsti nel setup iniziale</div></div></div>
+        <div style="display:flex;gap:10px;align-items:flex-start;"><span style="color:#94a3b8;font-weight:700;flex-shrink:0;">✗</span><div><div style="font-size:13px;font-weight:600;color:#64748b;">Modifiche strutturali alla logica</div><div style="font-size:12px;color:#94a3b8;margin-top:2px;">Cambiare il funzionamento principale di un workflow esistente</div></div></div>
+        <div style="display:flex;gap:10px;align-items:flex-start;"><span style="color:#94a3b8;font-weight:700;flex-shrink:0;">✗</span><div><div style="font-size:13px;font-weight:600;color:#64748b;">Urgenze fuori orario</div><div style="font-size:12px;color:#94a3b8;margin-top:2px;">Interventi richiesti nel weekend o fuori orario lavorativo</div></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CALENDAR -->
+<div class="wrap">
+  <div class="cal-box">
+    <h2>Scelga uno slot per la chiamata</h2>
+    <p class="sub">20 minuti — le mostro come funziona in concreto per IQM</p>
+    <div class="slots-grid">
+      <div class="slot-card" onclick="selectSlot(this,'Martedì 13 maggio','9:30')">
+        <div class="day-name">Mar</div>
+        <div class="day-num">13</div>
+        <div class="month">Maggio</div>
+        <div class="time">9:30</div>
+        <div class="dur">20 min</div>
+      </div>
+      <div class="slot-card" onclick="selectSlot(this,'Mercoledì 14 maggio','10:00')">
+        <div class="day-name">Mer</div>
+        <div class="day-num">14</div>
+        <div class="month">Maggio</div>
+        <div class="time">10:00</div>
+        <div class="dur">20 min</div>
+      </div>
+      <div class="slot-card" onclick="selectSlot(this,'Giovedì 15 maggio','9:30')">
+        <div class="day-name">Gio</div>
+        <div class="day-num">15</div>
+        <div class="month">Maggio</div>
+        <div class="time">9:30</div>
+        <div class="dur">20 min</div>
+      </div>
+      <div class="slot-card" onclick="selectSlot(this,'Lunedì 18 maggio','10:00')">
+        <div class="day-name">Lun</div>
+        <div class="day-num">18</div>
+        <div class="month">Maggio</div>
+        <div class="time">10:00</div>
+        <div class="dur">20 min</div>
+      </div>
+    </div>
+
+    <div class="confirm-area" id="confirmArea">
+      <h3>Conferma appuntamento — <span id="slotLabel"></span></h3>
+      <div class="form-row">
+        <input class="form-input" placeholder="Nome" id="fname">
+        <input class="form-input" placeholder="Email aziendale" id="femail">
+      </div>
+      <button class="confirm-btn" onclick="sendBooking()">Conferma appuntamento</button>
+      <div class="cta-note">Riceverà conferma immediata · Nessun impegno</div>
+    </div>
+  </div>
+</div>
+
+<script>
+let selectedSlot = '';
+function selectSlot(el, label, time) {
+  document.querySelectorAll('.slot-card').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedSlot = label + ' alle ' + time;
+  document.getElementById('slotLabel').textContent = selectedSlot;
+  document.getElementById('confirmArea').classList.add('show');
+}
+function sendBooking() {
+  const name = document.getElementById('fname').value.trim();
+  const email = document.getElementById('femail').value.trim();
+  if (!name || !email) { alert('Inserisca nome e email per procedere.'); return; }
+  const subject = encodeURIComponent('Appuntamento IQM Selezione — ' + selectedSlot);
+  const body = encodeURIComponent(
+    'Salve Fabio,\n\nVorrei confermare la chiamata per ' + selectedSlot + '.\n\nNome: ' + name + '\nEmail: ' + email + '\n\nCordiali saluti,\nAlberto Baggini\nIQM Selezione'
+  );
+  window.location.href = 'mailto:elfuerte2014.jqs@gmail.com?subject=' + subject + '&body=' + body;
+}
+</script>
+
+<!-- DRAW CONNECTIONS -->
+<script>
+function drawConnections(svgId, nodeIds) {
+  const svg = document.getElementById(svgId);
+  if (!svg) return;
+  const canvas = svg.parentElement;
+  for (let i = 0; i < nodeIds.length - 1; i++) {
+    const fromEl = document.getElementById(nodeIds[i]);
+    const toEl = document.getElementById(nodeIds[i + 1]);
+    if (!fromEl || !toEl) continue;
+    const x1 = fromEl.offsetLeft + fromEl.offsetWidth - 5;
+    const y1 = fromEl.offsetTop + fromEl.offsetHeight / 2;
+    const x2 = toEl.offsetLeft + 5;
+    const y2 = toEl.offsetTop + toEl.offsetHeight / 2;
+    const mx = (x1 + x2) / 2;
+    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    path.setAttribute('d', `M${x1},${y1} C${mx},${y1} ${mx},${y2} ${x2},${y2}`);
+    path.setAttribute('stroke', '#6366f1');
+    path.setAttribute('stroke-width', '1.5');
+    path.setAttribute('fill', 'none');
+    path.setAttribute('stroke-dasharray', '4,3');
+    path.setAttribute('opacity', '0.6');
+    svg.appendChild(path);
+  }
+}
+window.addEventListener('load', () => {
+  drawConnections('svg1', ['n1_1','n1_2','n1_3','n1_4','n1_6']);
+  drawConnections('svg1', ['n1_3','n1_5']);
+  drawConnections('svg2', ['n2_1','n2_2','n2_3','n2_6']);
+  drawConnections('svg2', ['n2_2','n2_4']);
+  drawConnections('svg2', ['n2_2','n2_5']);
+  drawConnections('svg3', ['n3_1','n3_2','n3_3','n3_4','n3_5']);
+  drawConnections('svg4', ['n4_1','n4_2','n4_3','n4_4','n4_6']);
+  drawConnections('svg4', ['n4_3','n4_5']);
+});
+</script>
+
+</body>
+</html>
