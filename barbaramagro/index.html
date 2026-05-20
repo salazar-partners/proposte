@@ -360,36 +360,16 @@
   <!-- CALENDAR -->
   <div class="cal-box">
     <h2>📅 Prenota una chiamata di 20 minuti</h2>
-    <p class="sub">Scegli il giorno e l'orario che preferisci — ti confirmiamo subito</p>
+    <p class="sub">Disponibilità esclusiva — unico slot rimasto questa settimana</p>
 
-    <div style="text-align:center;margin-bottom:24px;">
-      <button id="openCalBtn" onclick="openCalendar()" style="background:#0f172a;color:#fff;border:none;padding:16px 36px;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;box-shadow:0 4px 16px rgba(15,23,42,0.3);transition:all 0.2s;" onmouseover="this.style.background='#1e293b'" onmouseout="this.style.background='#0f172a'">
-        📅 Scegli data e orario →
-      </button>
-    </div>
-
-    <div id="calendarSlots" style="display:none;">
-      <div class="slots-grid">
-        <div class="slot-card" onclick="selectSlot(this, 'Martedì 19 Maggio', '11:30–11:50')">
-          <div class="day-name">Martedì</div>
-          <div class="day-num">19</div>
-          <div class="month">Maggio</div>
-          <div class="time">11:30</div>
-          <div class="dur">20 minuti</div>
-        </div>
-        <div class="slot-card" onclick="selectSlot(this, 'Mercoledì 20 Maggio', '11:30–11:50')">
-          <div class="day-name">Mercoledì</div>
-          <div class="day-num">20</div>
-          <div class="month">Maggio</div>
-          <div class="time">11:30</div>
-          <div class="dur">20 minuti</div>
-        </div>
-        <div class="slot-card" onclick="selectSlot(this, 'Giovedì 21 Maggio', '11:30–11:50')">
+    <div id="calendarSlots">
+      <div class="slots-grid" style="grid-template-columns:repeat(1,1fr);max-width:200px;">
+        <div class="slot-card" onclick="selectSlot(this, 'Giovedì 21 Maggio', '13:30–13:50')">
           <div class="day-name">Giovedì</div>
           <div class="day-num">21</div>
           <div class="month">Maggio</div>
-          <div class="time">11:30</div>
-          <div class="dur">20 minuti</div>
+          <div class="time">13:30</div>
+          <div class="dur">Ultimo slot disponibile</div>
         </div>
       </div>
     </div>
@@ -457,19 +437,6 @@ window.addEventListener('load', initAll);
 window.addEventListener('resize', initAll);
 
 let selectedSlot = null;
-
-function openCalendar() {
-  document.getElementById('openCalBtn').style.display = 'none';
-  const slots = document.getElementById('calendarSlots');
-  slots.style.display = 'block';
-  slots.style.opacity = '0';
-  slots.style.transform = 'translateY(12px)';
-  slots.style.transition = 'all 0.35s ease';
-  requestAnimationFrame(() => {
-    slots.style.opacity = '1';
-    slots.style.transform = 'translateY(0)';
-  });
-}
 
 function selectSlot(el, day, time) {
   document.querySelectorAll('.slot-card').forEach(c => c.classList.remove('selected'));
